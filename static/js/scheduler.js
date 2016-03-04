@@ -7,9 +7,10 @@ function nextNote() {
     current16thNote++;    // 次の拍へ
     if (current16thNote == 16) {
         current16thNote = 0;
-        var random = Math.floor(Math.random() * currentObj.connect.length);
-        console.log(random);
-        currentObj = currentObj.connect[random];
+        if(currentObj.connect != undefined){
+            var random = Math.floor(Math.random() * currentObj.connect.length);
+            currentObj = currentObj.connect[random];
+        }
     }
 }
 
