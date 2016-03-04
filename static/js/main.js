@@ -9,15 +9,15 @@ function init() {
     createjs.Ticker.addEventListener('tick', tick);
 }
 
-var isClick = false;
-var isMoved = false;
-var moveObj = undefined;
+var isClick = false;//オブジェクトがクリックされたかのフラグ
+var isMoved = false;//オブジェクトが移動したかのフラグ
+var moveObj = undefined;//クリックされたオブジェクト
 $(window).on('mousedown', function(event){
     var pt;
 
     for(var i=0; i<objectList.length; i++){
         pt = objectList[i].obj.container.globalToLocal(event.pageX, event.pageY);
-        //クリックした時にオブジェクトがあったら移動モードにする
+        //オブジェクトがクリックされたかを判定
         if(objectList[i].obj.container.hitTest(pt.x, pt.y)){
             isClick = true;
             moveObj = objectList[i];
@@ -25,7 +25,7 @@ $(window).on('mousedown', function(event){
     }
 });
 $(window).on('mousemove', function(event){
-    //移動処理
+    //オブジェクトがクリックされていたら移動処理をする
     if(isClick){
         moveObj.move(event.pageX, event.pageY);
         isMoved = true;
@@ -36,6 +36,7 @@ $(window).on('mouseup', function(event){
     var pt;
     var lineIds;
     var target;
+    //オブジェクトが動いていなければ削除する
     if(!isMoved){
         for(var i=0; i<objectList.length; i++){
             pt = objectList[i].obj.container.globalToLocal(event.pageX, event.pageY);
