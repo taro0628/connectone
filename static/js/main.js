@@ -66,11 +66,28 @@ $(window).on('mouseup', function(event){
     if(currentObj == undefined){
         currentObj = objectList[objectList.length-1];
     }
+
+    placeText(objectList[objectList.length-1], ['test1', 'test2', 'test3'], event.pageX, event.pageY, 100)
+
     //他にオブジェクトがあれば線を引く
     if(objectList.length>1){
         drawLine(objectList[objectList.length-1]);
     }
 });
+
+function placeText(obj, textArray, x, y, r){
+    var divCount = textArray.length;
+    var radianInterval = (2 * Math.PI) / divCount;
+    var _x;
+    var _y;
+    obj.r = r;
+    for (var i = 0; i < divCount; i++) {
+        _x = r * Math.cos(radianInterval * i) + x
+        _y = r * Math.sin(radianInterval * i) + y
+        obj.textList.push(new Text(_x, _y, '#96bbb3', textArray[i]));
+        obj.textList[obj.textList.length-1].display();
+    }
+}
 
 function tick() {
     var currentTime = ctx.currentTime;
