@@ -1,14 +1,16 @@
-function Text(x, y, c, text){
+function Text(x, y, c, text, parent){
 
     this.x = x;
     this.y = y;
     this.color = c;
-    this.score = [9,0,0,0, 9,0,9,0, 0,0,0,0, 0,0,0,0];
+    this.score = [9,0,0,0, 9,0,0,0, 9,0,0,0, 9,0,0,0];
     this.notesInQueue = [];
     this.recipe = recipe1;
     this.container = new createjs.Container();
 
     this.connect = [];
+
+    this.parent = parent;
 
     this.string = new createjs.Text(text, "20px Arial", c);
     this.circleBase = new createjs.Shape();

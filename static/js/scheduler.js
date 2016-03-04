@@ -18,9 +18,9 @@ function nextNote() {
     if (current16thNote == 16) {
         current16thNote = 0;
         if(currentObj != undefined){
-            if(currentObj.connect != undefined){
-                var random = Math.floor(Math.random() * currentObj.connect.length);
-                currentObj = currentObj.connect[random];
+            if(currentObj.nextObjs.length != 0){
+                var random = Math.floor(Math.random() * currentObj.nextObjs.length);
+                currentObj = currentObj.nextObjs[random];
             }
         }
     }
@@ -39,16 +39,18 @@ function scheduleNote( beatNumber, time ) {
     }
     if(currentObj != undefined){
 
-        var objScore = currentObj.score;
-        var objQueue = currentObj.notesInQueue;
-        var objRecipe = currentObj.recipe;
-
-        if (objScore[beatNumber] != 0){
-            objQueue.push( { note: beatNumber, time: time } );
-            var synth = new Synth(ctx, objRecipe);
-            synth.noteOn(objScore[beatNumber], time);
-            synth.noteOff(time + noteLength);
+        for (var i = 0; i < currentObj.textList.length; i++) {
+            var textScore = currentObj.textList[i].score;
+            var textQueue = currentObj.textList[i].notesInQueue;
+            var textRecipe = currentObj.textList[i].recipe;
+            if (textScore[beatNumber] != 0){
+                textQueue.push( { note: beatNumber, time: time } );
+                var synth = new Synth(ctx, textRecipe);
+                synth.noteOn(textScore[beatNumber], time);
+                synth.noteOff(time + noteLength);
+            }
         }
+
     }
 
 }

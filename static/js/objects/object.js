@@ -9,6 +9,8 @@ function Obj(x, y, c, objfunc){
 
     this.textList = [];
 
+    this.nextObjs = [];
+
     this.score = this.obj.score;
     this.notesInQueue = [];
     this.recipe = recipe1;

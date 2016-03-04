@@ -88,7 +88,7 @@ function createObj(pageX, pageY, text){
         currentObj = objectList[objectList.length-1];
     }
 
-    placeText(objectList[objectList.length-1], ['test1', 'test2', 'test3'], pageX, pageY, 120)
+    placeText(objectList[objectList.length-1], ['test1', 'test2', 'test3'], pageX, pageY, 80)
 
     //他にオブジェクトがあれば線を引く
     if(objectList.length>1){
@@ -106,7 +106,7 @@ function placeText(obj, textArray, x, y, r){
     for (var i = 0; i < divCount; i++) {
         _x = r * Math.cos(radianInterval * i) + x
         _y = r * Math.sin(radianInterval * i) + y
-        obj.textList.push(new Text(_x, _y, '#96bbb3', textArray[i]));
+        obj.textList.push(new Text(_x, _y, '#96bbb3', textArray[i], obj));
         obj.textList[obj.textList.length-1].display();
     }
 }
@@ -122,7 +122,18 @@ function tick() {
             objectList[i].noteOn();
             objQueue.splice(0,1);   // remove note from queue
         }
+        for (var j=0; j<objectList[i].textList.length; j++){
+            var textScore = objectList[i].textList[j].score;
+            var textQueue = objectList[i].textList[j].notesInQueue;
+
+            if (textQueue.length && textQueue[0].time < currentTime) {
+                objectList[i].textList[j].noteOn();
+
+                textQueue.splice(0,1);   // remove note from queue
+            }
+        }
     }
+
     for(var i=0; i<lineList.length; i++){
         lineList[i].update();
     }

@@ -18,31 +18,31 @@ function CirclePart(x, y, c, isBlur){
 
     this.circleBase.graphics
         .beginFill(backColor)
-        .drawCircle(0,0,100);
+        .drawCircle(0,0,60);
     this.circle1.graphics
         .beginStroke(c)
-        .setStrokeStyle(2)
-        .arc(0,0,40,Math.PI*1,Math.PI*2);
+        .setStrokeStyle(1)
+        .arc(0,0,60,Math.PI*1.5,Math.PI*2);
     this.circle2.graphics
+        .beginStroke(c)
+        .setStrokeStyle(1)
+        .arc(0,0,55,Math.PI*0.5,Math.PI*1.2);
+    this.circle3.graphics
         .beginStroke(c)
         .setStrokeStyle(2)
         .arc(0,0,50,Math.PI*0.0,Math.PI*0.5);
-    this.circle3.graphics
-        .beginStroke(c)
-        .setStrokeStyle(1)
-        .arc(0,0,70,Math.PI*1.5,Math.PI*2);
     this.circle4.graphics
         .beginStroke(c)
-        .setStrokeStyle(1)
-        .arc(0,0,60,Math.PI*0.5,Math.PI*1.2);
+        .setStrokeStyle(2)
+        .arc(0,0,45,Math.PI*1,Math.PI*2);
     this.circle5.graphics
         .beginStroke(c)
         .setStrokeStyle(1)
-        .arc(0,0,30,Math.PI*0.5,Math.PI*1);
+        .arc(0,0,40,Math.PI*0.5,Math.PI*1);
     this.circle6.graphics
         .beginStroke(c)
         .setStrokeStyle(1)
-        .arc(0,0,20,Math.PI*1.5,Math.PI*2);
+        .arc(0,0,35,Math.PI*1.5,Math.PI*2);
 
     this.circleBase.alpha = 0.01;
     this.container.x = x;

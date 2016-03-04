@@ -8,6 +8,15 @@ function Line(start, target, c){
     start.connect.push(target);
     target.connect.push(start);
 
+    if(start.nextObjs != undefined){
+        start.nextObjs.push(target.parent);
+        target.parent.nextObjs.push(start);
+    }
+    if(target.nextObjs != undefined){
+        target.nextObjs.push(start.parent);
+        start.parent.nextObjs.push(target);
+    }
+
     this.line = new createjs.Shape();
     this.lineBlur = new createjs.Shape();
 
