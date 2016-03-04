@@ -61,19 +61,41 @@ $(window).on('mouseup', function(event){
     }
 
     //何もなければ新しくオブジェクトを作成
-    objectList.push(new Obj(event.pageX, event.pageY, '#96bbb3', CirclePart));
+    if(objectList.length == 0){
+        createObj(event.pageX, event.pageY);
+        return;
+    }
+
+    for(var i=0; i<objectList.length; i++){
+        for (var j=0; j<objectList[i].textList.length; j++) {
+            var text = objectList[i].textList[j];
+            pt = text.container.globalToLocal(event.pageX, event.pageY);
+            //テキストをクリックした時にオブジェクトを追加する
+            if(text.container.hitTest(pt.x, pt.y)){
+                createObj(2*(text.x-objectList[i].x) + objectList[i].x, 2*(text.y-objectList[i].y) + objectList[i].y, text);
+                return;
+            }
+        }
+    }
+
+});
+
+function createObj(pageX, pageY, text){
+
+    objectList.push(new Obj(pageX, pageY, '#96bbb3', CirclePart));
     objectList[objectList.length-1].display();
     if(currentObj == undefined){
         currentObj = objectList[objectList.length-1];
     }
 
-    placeText(objectList[objectList.length-1], ['test1', 'test2', 'test3'], event.pageX, event.pageY, 100)
+    placeText(objectList[objectList.length-1], ['test1', 'test2', 'test3'], pageX, pageY, 120)
 
     //他にオブジェクトがあれば線を引く
     if(objectList.length>1){
-        drawLine(objectList[objectList.length-1]);
+        //drawLine(objectList[objectList.length-1]);
+        lineList.push(new Line(objectList[objectList.length-1], text, '#fff'));
     }
-});
+}
 
 function placeText(obj, textArray, x, y, r){
     var divCount = textArray.length;

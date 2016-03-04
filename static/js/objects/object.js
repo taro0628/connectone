@@ -41,5 +41,7 @@ Obj.prototype.move = function(x, y){
         _x = this.r * Math.cos(radianInterval * i) + x
         _y = this.r * Math.sin(radianInterval * i) + y
         this.textList[i].move(_x, _y);
+        this.textList[i].x = _x;
+        this.textList[i].y = _y;
     }
 };

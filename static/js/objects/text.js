@@ -8,6 +8,8 @@ function Text(x, y, c, text){
     this.recipe = recipe1;
     this.container = new createjs.Container();
 
+    this.connect = [];
+
     this.string = new createjs.Text(text, "20px Arial", c);
     this.circleBase = new createjs.Shape();
 
@@ -68,5 +70,6 @@ Text.prototype.remove =  function(){
 Text.prototype.move = function(_x, _y){
     createjs.Tween.get(this.container,{override:true})
     .to({x:_x, y:_y}, 100)
-    .call(function(){this.x=_x;this.y=_y});
+    .call(function(){this.x=_x;this.y=_y;});
+
 };

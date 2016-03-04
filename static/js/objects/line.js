@@ -52,6 +52,7 @@ Line.prototype.update = function(){
         var tx = this.tx = this.target.x;
         var ty = this.ty = this.target.y;
 
+
         createjs.Tween.get(this.startLine)
         .to({x:sx,y:sy}, 100);
         createjs.Tween.get(this.targetLine)
@@ -106,7 +107,6 @@ var removeConnection = function(line){
 
     while(isConnect){
         connectNum = $.inArray(line.target, line.start.connect);
-        console.log(connectNum);
         if(connectNum != -1){
             line.start.connect.splice(connectNum, 1);
         }else{
