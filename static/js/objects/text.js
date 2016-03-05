@@ -1,16 +1,14 @@
-function Text(x, y, c, text, parent){
+function Text(x, y, c, text){
 
     this.x = x;
     this.y = y;
     this.color = c;
-    this.score = [9,0,0,0, 9,0,0,0, 9,0,0,0, 9,0,0,0];
     this.notesInQueue = [];
-    this.recipe = recipe1;
+    this.recipe = makeRecipe(text);
+    this.pitch = makePitch(text);
     this.container = new createjs.Container();
 
-    this.connect = [];
-
-    this.parent = parent;
+    this.connectedObjs = [];
 
     this.string = new createjs.Text(text, "20px Arial", c);
     this.circleBase = new createjs.Shape();
@@ -73,5 +71,52 @@ Text.prototype.move = function(_x, _y){
     createjs.Tween.get(this.container,{override:true})
     .to({x:_x, y:_y}, 100)
     .call(function(){this.x=_x;this.y=_y;});
-
+    this.x = _x;
+    this.y = _y;
 };
+
+function makeRecipe(text){
+    var len = Math.floor(Math.random() * 12);
+    len = text.length;
+    if(len < 3){
+        return recipe1;
+    }else if(len < 6){
+        return recipe2;
+    }else if(len < 9){
+        return recipe3;
+    }else{
+        return recipe1;
+    }
+}
+
+function makePitch(text){
+    len = text.length;
+    if(len < 3){
+        return 9;
+    }else if(len < 6){
+        return 11;
+    }else if(len < 9){
+        return 13;
+    }else{
+        return 15;
+    }
+}
+
+function makeScore(text){
+    var len = Math.floor(Math.random() * 12);
+
+    score1 = [7,0,0,0];
+    score2 = [11,0,9,0];
+    score3 = [0,5,0,9];
+    score4 = [9,0,8,0];
+
+    if(len < 3){
+        return score1.concat(score3).concat(score2).concat(score1);
+    }else if(len < 6){
+        return score3.concat(score2).concat(score2).concat(score3);
+    }else if(len < 9){
+        return score2.concat(score4).concat(score4).concat(score1);
+    }else{
+        return score2.concat(score3).concat(score3).concat(score2);
+    }
+}

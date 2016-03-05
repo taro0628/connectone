@@ -149,49 +149,37 @@ Synth.prototype.setVCA = function(synth, currentNode, destNode, node) {
 
 Synth.prototype.setVCF = function(synth, currentNode, destNode, node) {
 
-    var base_freq = synth.freq;
-    var freq = synth.freq/10;
+    var freq = synth.freq;
 
     var param = currentNode['param'];
     var vcf = synth.createNode(currentNode, node, synth.ctx.createBiquadFilter());
-    var vcf2 = synth.createNode(currentNode, node, synth.ctx.createBiquadFilter());
 
     if (param['frequency'] == 'cv'){
-        vcf.frequency.value = 300 + Math.pow(2.0, (freq + 30) / 10);
-        vcf2.frequency.value = 300 + Math.pow(2.0, (freq + 30) / 10);
+        vcf.frequency.value = freq;
     //frequencyにオブジェクトが設定されていればそのオブジェクトをfrequencyにつなぐ
     }else if(param['frequency']['name'] != undefined){
         var paramNode = param['frequency'];
         synth.setSynth(paramNode, vcf.frequency);
-        synth.setSynth(paramNode, vcf2.frequency);
 
     //それ以外は数値とみなして代入
     }else{
         vcf.frequency.value = param['frequency'];
-        vcf2.frequency.value = param['frequency'];
     }
 
     if(param['detune'] != undefined){
         if(param['detune']['name'] != undefined){
             var paramNode = param['detune'];
             synth.setSynth(paramNode, vcf.detune);
-            synth.setSynth(paramNode, vcf2.detune);
         //それ以外は数値とみなして代入
         }else{
             vcf.frequency.value = param['detune'];
-            vcf2.frequency.value = param['detune'];
         }
     }
 
     vcf.type = param['type'];
-    //vcf.frequency.value = param['frequency'];
     vcf.Q.value = param['Q'];
     vcf.gain.value = param['gain'];
 
-    vcf2.type = 'peaking';
-    //vcf.frequency.value = param['frequency'];
-    vcf2.Q.value = param['Q'];
-    vcf2.gain.value = param['gain']*2;
     var input = currentNode['input'];
 
     //VCFに接続されるノードの設定が終わっていなければ設定する
@@ -199,8 +187,7 @@ Synth.prototype.setVCF = function(synth, currentNode, destNode, node) {
         synth.setSynth(input, vcf);
     }
     //VCFノードをdestNodeに接続
-    vcf.connect(vcf2);
-    vcf2.connect(destNode);
+    vcf.connect(destNode);
     currentNode['state'] = true;
 };
 
@@ -209,31 +196,29 @@ Synth.prototype.setSynth = function(currentNode, destNode) {
     node.setNode(this, currentNode, destNode, node);
 }
 
-Synth.prototype.EnvOn = function(vca, param) {
-    var now = this.ctx.currentTime;
+Synth.prototype.EnvOn = function(vca, param, time) {
     var attack = param['attack'];
     var decay = param['decay'];
     var sustain = param['sustain'];
     var gain = param['gain'];
 
     vca.gain.cancelScheduledValues(0);  // スケジュールを全て解除
-    vca.gain.setValueAtTime(0.0, now);  // 今時点を音の出始めとする
-    vca.gain.linearRampToValueAtTime(gain, now + attack);
+    vca.gain.setValueAtTime(0.0, time);  // 今時点を音の出始めとする
+    vca.gain.linearRampToValueAtTime(gain, time + attack);
     // ▲ gainまでattackかけて直線的に変化
-    vca.gain.linearRampToValueAtTime(sustain * gain, now + attack + decay);
+    vca.gain.linearRampToValueAtTime(sustain * gain, time + attack + decay);
     // ▲ sustain * gainまでattack+decayかけて直線的に変化
 
     return ;
 };
-Synth.prototype.EnvOff = function(vca, param) {
-    var now = this.ctx.currentTime;
+Synth.prototype.EnvOff = function(vca, param, time) {
     var sustain = param['sustain'];
     var gain = param['gain'];
     var release = param['release'];
 
     // 音が途切れるのを防ぐために設定
-    vca.gain.setValueAtTime(sustain * gain, now);
-    vca.gain.linearRampToValueAtTime(0, now + release);
+    vca.gain.setValueAtTime(sustain * gain, time);
+    vca.gain.linearRampToValueAtTime(0, time + release);
 
     return;
 };
@@ -256,7 +241,7 @@ Synth.prototype.noteOn = function(noteNo, time) {
         }
         if (nodeManager[key].type == 'Env'){
             for (var i=0; i<nodeManager[key].currentId; i++){
-                this.EnvOn(nodeManager[key].nodeList[i], nodeManager[key].paramList[i]);
+                this.EnvOn(nodeManager[key].nodeList[i], nodeManager[key].paramList[i], time);
             }
         }
     }
@@ -278,7 +263,7 @@ Synth.prototype.noteOff = function(time){
         if (nodeManager[key].type == 'Env'){
             //vcaのreleaseに合わせて音量を0にする
             for (var i=0; i<this.nodeManager['Env'].currentId; i++){
-                this.EnvOff(nodeManager[key].nodeList[i], nodeManager[key].paramList[i]);
+                this.EnvOff(nodeManager[key].nodeList[i], nodeManager[key].paramList[i], time);
             }
         }
     }

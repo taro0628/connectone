@@ -21,6 +21,16 @@ $(window).on('mousedown', function(event){
         if(objectList[i].obj.container.hitTest(pt.x, pt.y)){
             isClick = true;
             moveObj = objectList[i];
+            return;
+        }
+        //テキストも移動できるように判定
+        for(var j=0; j<objectList[i].textList.length; j++){
+            pt = objectList[i].textList[j].container.globalToLocal(event.pageX, event.pageY);
+            if(objectList[i].textList[j].container.hitTest(pt.x, pt.y)){
+                isClick = true;
+                moveObj = objectList[i].textList[j];
+                return;
+            }
         }
     }
 });
@@ -60,19 +70,19 @@ $(window).on('mouseup', function(event){
         return;
     }
 
-    //何もなければ新しくオブジェクトを作成
+    //画面に何もなければ新しくオブジェクトを作成
     if(objectList.length == 0){
         createObj(event.pageX, event.pageY);
         return;
     }
 
+    //テキストをクリックした時にオブジェクトを追加する
     for(var i=0; i<objectList.length; i++){
         for (var j=0; j<objectList[i].textList.length; j++) {
             var text = objectList[i].textList[j];
             pt = text.container.globalToLocal(event.pageX, event.pageY);
-            //テキストをクリックした時にオブジェクトを追加する
             if(text.container.hitTest(pt.x, pt.y)){
-                createObj(2*(text.x-objectList[i].x) + objectList[i].x, 2*(text.y-objectList[i].y) + objectList[i].y, text);
+                createObj(2*(text.x-objectList[i].x) + objectList[i].x, 3*(text.y-objectList[i].y) + objectList[i].y, text);
                 return;
             }
         }
@@ -88,7 +98,7 @@ function createObj(pageX, pageY, text){
         currentObj = objectList[objectList.length-1];
     }
 
-    placeText(objectList[objectList.length-1], ['test1', 'test2', 'test3'], pageX, pageY, 80)
+    placeText(objectList[objectList.length-1], ['t1', 'test2', 'testaaaaaaaaa3'], pageX, pageY, 100)
 
     //他にオブジェクトがあれば線を引く
     if(objectList.length>1){
@@ -106,8 +116,10 @@ function placeText(obj, textArray, x, y, r){
     for (var i = 0; i < divCount; i++) {
         _x = r * Math.cos(radianInterval * i) + x
         _y = r * Math.sin(radianInterval * i) + y
-        obj.textList.push(new Text(_x, _y, '#96bbb3', textArray[i], obj));
+        obj.textList.push(new Text(_x, _y, '#96bbb3', textArray[i]));
         obj.textList[obj.textList.length-1].display();
+        obj.textList[obj.textList.length-1].connectedObjs.push(obj);
+        lineList.push(new Line(obj, obj.textList[obj.textList.length-1], '#fff'));
     }
 }
 
@@ -117,8 +129,8 @@ function tick() {
     for(var i=0; i<objectList.length; i++){
         var objScore = objectList[i].score;
         var objQueue = objectList[i].notesInQueue;
-
         if (objQueue.length && objQueue[0].time < currentTime) {
+
             objectList[i].noteOn();
             objQueue.splice(0,1);   // remove note from queue
         }
@@ -128,7 +140,6 @@ function tick() {
 
             if (textQueue.length && textQueue[0].time < currentTime) {
                 objectList[i].textList[j].noteOn();
-
                 textQueue.splice(0,1);   // remove note from queue
             }
         }
