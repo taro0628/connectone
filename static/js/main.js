@@ -47,7 +47,7 @@ $(window).on('mouseup', function(event){
     var lineIds;
     var target;
     //オブジェクトが動いていなければ削除する
-    if(!isMoved){
+    /*if(!isMoved){
         for(var i=0; i<sequencerList.length; i++){
             pt = sequencerList[i].component.container.globalToLocal(event.pageX, event.pageY);
             //クリックした時にオブジェクトがあったら削除する
@@ -60,10 +60,10 @@ $(window).on('mouseup', function(event){
                 return;
             }
         }
-    }
+    }*/
 
     //移動モードを解除
-    if(isClick){
+    if(isMoved){
         moveObj.move(event.pageX, event.pageY);
         isClick = false;
         isMoved = false;
@@ -97,33 +97,25 @@ function createObj(pageX, pageY, tone){
     var seq = new Sequencer(pageX, pageY, '#96bbb3', Circle);
     sequencerList.push(seq);
     seq.display();
-    if(currentSeq == undefined){
-        currentSeq = seq;
-    }
 
-    placeTone(seq, ['t1', 'test2', 'testaaaaaaaaa3'], pageX, pageY, 100)
-
-    //他にシーケンサーがあれば線を引く
-    if(sequencerList.length>1){
+    //トーンが指定されていれば線を引く
+    if(tone != undefined){
         lineList.push(new Line(seq, tone, '#fff'));
     }
 }
 
-function placeTone(sequencer, textArray, x, y, r){
-    var divCount = textArray.length;
-    var radianInterval = (2 * Math.PI) / divCount;
+function placeTone(sequencer, text, x, y, r){
     var _x;
     var _y;
+    var random = 2*Math.PI * Math.random();
     sequencer.r = r;
-    for (var i = 0; i < divCount; i++) {
-        _x = r * Math.cos(radianInterval * i) + x;
-        _y = r * Math.sin(radianInterval * i) + y;
-        var tone = new Tone(_x, _y, '#96bbb3', textArray[i]);
-        sequencer.toneList.push(tone);
-        tone.display();
-        tone.connectedSeq.push(sequencer);
-        lineList.push(new Line(sequencer, tone, '#fff'));
-    }
+    _x = r * Math.cos(random) + x;
+    _y = r * Math.sin(random) + y;
+    var tone = new Tone(_x, _y, '#96bbb3', text);
+    sequencer.toneList.push(tone);
+    tone.display();
+    tone.connectedSeq.push(sequencer);
+    lineList.push(new Line(sequencer, tone, '#fff'));
 }
 
 function tick() {
