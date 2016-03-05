@@ -9,9 +9,6 @@ function init() {
     createjs.Ticker.addEventListener('tick', tick);
 }
 
-var isClick = false;//オブジェクトがクリックされたかのフラグ
-var isMoved = false;//オブジェクトが移動したかのフラグ
-var moveObj = undefined;//クリックされたオブジェクト
 $(window).on('mousedown', function(event){
     var pt;
 
@@ -44,8 +41,6 @@ $(window).on('mousemove', function(event){
 
 $(window).on('mouseup', function(event){
     var pt;
-    var lineIds;
-    var target;
     //オブジェクトが動いていなければ削除する
     /*if(!isMoved){
         for(var i=0; i<sequencerList.length; i++){
@@ -72,7 +67,7 @@ $(window).on('mouseup', function(event){
 
     //画面に何もなければ新しくシーケンサーを作成
     if(sequencerList.length == 0){
-        createObj(event.pageX, event.pageY);
+        placeSequncer(event.pageX, event.pageY);
         return;
     }
 
@@ -84,7 +79,7 @@ $(window).on('mouseup', function(event){
             if(tone.container.hitTest(pt.x, pt.y)){
                 var _x = 2*(tone.x-sequencerList[i].x) + sequencerList[i].x;
                 var _y = 2*(tone.y-sequencerList[i].y) + sequencerList[i].y;
-                createObj(_x, _y, tone);
+                placeSequncer(_x, _y, tone);
                 isClick = false;
                 isMoved = false;
                 return;
@@ -106,9 +101,11 @@ $(window).on('mouseup', function(event){
 
 });
 
-function createObj(pageX, pageY, tone){
+function placeSequncer(x, y, tone){
 
-    var seq = new Sequencer(pageX, pageY, '#96bbb3', Circle);
+    tone = tone || undefined;
+    
+    var seq = new Sequencer(x, y, '#96bbb3', Circle);
     sequencerList.push(seq);
     seq.display();
 
