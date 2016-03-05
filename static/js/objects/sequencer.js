@@ -3,6 +3,7 @@ function Sequencer(x, y, c, component){
     this.y = y;
     this.color = c;
     this.component = new component(x, y, c, false);
+    this.container = this.component.container;
     this.componentBlur = new component(x, y, c, true);
 
     this.toneList = [];

@@ -13,19 +13,20 @@ $(window).on('mousedown', function(event){
     var pt;
 
     for(var i=0; i<sequencerList.length; i++){
-        pt = sequencerList[i].component.container.globalToLocal(event.pageX, event.pageY);
+        var seq = sequencerList[i];
+        pt = seq.container.globalToLocal(event.pageX, event.pageY);
         //シーケンサーがクリックされたかを判定
-        if(sequencerList[i].component.container.hitTest(pt.x, pt.y)){
+        if(seq.container.hitTest(pt.x, pt.y)){
             isClick = true;
-            moveObj = sequencerList[i];
+            moveObj = seq;
             return;
         }
         //トーンも移動できるように判定
-        for(var j=0; j<sequencerList[i].toneList.length; j++){
-            pt = sequencerList[i].toneList[j].container.globalToLocal(event.pageX, event.pageY);
-            if(sequencerList[i].toneList[j].container.hitTest(pt.x, pt.y)){
+        for(var j=0; j<seq.toneList.length; j++){
+            pt = seq.toneList[j].container.globalToLocal(event.pageX, event.pageY);
+            if(seq.toneList[j].container.hitTest(pt.x, pt.y)){
                 isClick = true;
-                moveObj = sequencerList[i].toneList[j];
+                moveObj = seq.toneList[j];
                 return;
             }
         }
@@ -73,12 +74,14 @@ $(window).on('mouseup', function(event){
 
     //トーンをクリックした時にシーケンサーを追加する
     for(var i=0; i<sequencerList.length; i++){
-        for (var j=0; j<sequencerList[i].toneList.length; j++) {
-            var tone = sequencerList[i].toneList[j];
+        var seq = sequencerList[i];
+        for (var j=0; j<seq.toneList.length; j++) {
+            var tone = seq.toneList[j];
             pt = tone.container.globalToLocal(event.pageX, event.pageY);
             if(tone.container.hitTest(pt.x, pt.y)){
-                var _x = 2*(tone.x-sequencerList[i].x) + sequencerList[i].x;
-                var _y = 2*(tone.y-sequencerList[i].y) + sequencerList[i].y;
+                //すでに繋がれているシーケンサーとは逆位置に設置
+                var _x = 2*(tone.x-seq.x) + seq.x;
+                var _y = 2*(tone.y-seq.y) + seq.y;
                 placeSequncer(_x, _y, tone);
                 isClick = false;
                 isMoved = false;
@@ -90,8 +93,8 @@ $(window).on('mouseup', function(event){
     //シーケンサーをクリックした時にトーンを追加する
     for(var i=0; i<sequencerList.length; i++){
             var seq = sequencerList[i];
-            pt = seq.component.container.globalToLocal(event.pageX, event.pageY);
-            if(seq.component.container.hitTest(pt.x, pt.y)){
+            pt = seq.container.globalToLocal(event.pageX, event.pageY);
+            if(seq.container.hitTest(pt.x, pt.y)){
                 placeTone(seq, 'test', event.pageX, event.pageY, 90);
                 isClick = false;
                 isMoved = false;
@@ -102,9 +105,10 @@ $(window).on('mouseup', function(event){
 });
 
 function placeSequncer(x, y, tone){
-
+//シーケンサーを設置する関数
+//トーンが指定されていれば設置したシーケンサーと繋ぐ
     tone = tone || undefined;
-    
+
     var seq = new Sequencer(x, y, '#96bbb3', Circle);
     sequencerList.push(seq);
     seq.display();
@@ -116,6 +120,7 @@ function placeSequncer(x, y, tone){
 }
 
 function placeTone(sequencer, text, x, y, r){
+//トーンを設置する関数
     var _x;
     var _y;
     var random = 2*Math.PI * Math.random();
@@ -133,24 +138,27 @@ function tick() {
     var currentTime = ctx.currentTime;
 
     for(var i=0; i<sequencerList.length; i++){
-        var objScore = sequencerList[i].score;
-        var objQueue = sequencerList[i].notesInQueue;
-        if (objQueue.length && objQueue[0].time < currentTime) {
+        var seq = sequencerList[i];
+        var seqScore = seq.score;
+        var seqQueue = seq.notesInQueue;
 
-            sequencerList[i].noteOn();
-            objQueue.splice(0,1);   // remove note from queue
+        //シーケンサーのキューの時間が過ぎていればエフェクトを再生
+        if (seqQueue.length && seqQueue[0].time < currentTime) {
+            seq.noteOn();
+            seqQueue.splice(0,1);
         }
-        for (var j=0; j<sequencerList[i].toneList.length; j++){
-            var toneScore = sequencerList[i].toneList[j].score;
-            var toneQueue = sequencerList[i].toneList[j].notesInQueue;
-
+        for (var j=0; j<seq.toneList.length; j++){
+            var toneScore = seq.toneList[j].score;
+            var toneQueue = seq.toneList[j].notesInQueue;
+            //トーンのキューの時間が過ぎていればエフェクトを再生
             if (toneQueue.length && toneQueue[0].time < currentTime) {
-                sequencerList[i].toneList[j].noteOn();
-                toneQueue.splice(0,1);   // remove note from queue
+                seq.toneList[j].noteOn();
+                toneQueue.splice(0,1);
             }
         }
     }
 
+    //線の表示を更新
     for(var i=0; i<lineList.length; i++){
         lineList[i].update();
     }

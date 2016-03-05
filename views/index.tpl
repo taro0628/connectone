@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>SNSsound</title>
+    <title>Connectone</title>
     <link href="/static/css/reset.css" rel="stylesheet" type="text/css">
     <link href="/static/css/index.css" rel="stylesheet" type="text/css">
 </head>
