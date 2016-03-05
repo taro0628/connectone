@@ -82,12 +82,26 @@ $(window).on('mouseup', function(event){
             var tone = sequencerList[i].toneList[j];
             pt = tone.container.globalToLocal(event.pageX, event.pageY);
             if(tone.container.hitTest(pt.x, pt.y)){
-                var _x = 3*(tone.x-sequencerList[i].x) + sequencerList[i].x;
-                var _y = 3*(tone.y-sequencerList[i].y) + sequencerList[i].y;
+                var _x = 2*(tone.x-sequencerList[i].x) + sequencerList[i].x;
+                var _y = 2*(tone.y-sequencerList[i].y) + sequencerList[i].y;
                 createObj(_x, _y, tone);
+                isClick = false;
+                isMoved = false;
                 return;
             }
         }
+    }
+
+    //シーケンサーをクリックした時にトーンを追加する
+    for(var i=0; i<sequencerList.length; i++){
+            var seq = sequencerList[i];
+            pt = seq.component.container.globalToLocal(event.pageX, event.pageY);
+            if(seq.component.container.hitTest(pt.x, pt.y)){
+                placeTone(seq, 'test', event.pageX, event.pageY, 90);
+                isClick = false;
+                isMoved = false;
+                return;
+            }
     }
 
 });
