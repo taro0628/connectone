@@ -31,36 +31,36 @@ function scheduleNote( beatNumber, time ) {
         var dummy = ctx.createOscillator();
     }
     var synthQueue = [];
-    if(currentObj != undefined){
+    if(currentSeq != undefined){
         //オブジェクトのアニメーション用にキューに登録
-        var objScore = currentObj.score;
-        if (objScore[beatNumber] != 0){
-            currentObj.notesInQueue.push( { note: beatNumber, time: time } );
+        var seqScore = currentSeq.score;
+        if (seqScore[beatNumber] != 0){
+            currentSeq.notesInQueue.push( { note: beatNumber, time: time } );
         }
 
         //ここから音を出す処理
         var _time;
-        for (var i = 0; i < currentObj.textList.length; i++) {
-            var txt = currentObj.textList[i];
-            var txtQueue = txt.notesInQueue;
-            var txtRecipe = txt.recipe;//音色
-            for (var j = 0; j < txt.connectedObjs.length; j++) {
-                var obj = txt.connectedObjs[j];
-                var score = obj.score;
+        for (var i = 0; i < currentSeq.toneList.length; i++) {
+            var tone = currentSeq.toneList[i];
+            var toneQueue = tone.notesInQueue;
+            var toneRecipe = tone.recipe;//音色
+            for (var j = 0; j < tone.connectedSeq.length; j++) {
+                var seq = tone.connectedSeq[j];
+                var score = seq.score;
                 if (score[beatNumber] != 0){
                     //距離によってタイミングを変更
-                    var _x = txt.x - obj.x;
-                    var _y = txt.y - obj.y;
+                    var _x = tone.x - seq.x;
+                    var _y = tone.y - seq.y;
                     var dist = Math.sqrt(_x * _x + _y * _y);
                     _time = time + dist/1000;
-                    txtQueue.push( { note: beatNumber, time: _time } );
+                    toneQueue.push( { note: beatNumber, time: _time } );
 
                     //上書きしてしまわないように音源はキューで管理
                     if(synthQueue.length>10){
                         synthQueue.splice(0,1);
                     }
-                    synthQueue.push(new Synth(ctx, txtRecipe));
-                    synthQueue[synthQueue.length-1].noteOn(txt.pitch, _time);
+                    synthQueue.push(new Synth(ctx, toneRecipe));
+                    synthQueue[synthQueue.length-1].noteOn(tone.pitch, _time);
                     synthQueue[synthQueue.length-1].noteOff(_time + noteLength);
                 }
             }

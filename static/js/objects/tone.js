@@ -1,4 +1,4 @@
-function Text(x, y, c, text){
+function Tone(x, y, c, text){
 
     this.x = x;
     this.y = y;
@@ -8,7 +8,7 @@ function Text(x, y, c, text){
     this.pitch = makePitch(text);
     this.container = new createjs.Container();
 
-    this.connectedObjs = [];
+    this.connectedSeq = [];
 
     this.string = new createjs.Text(text, "20px Arial", c);
     this.circleBase = new createjs.Shape();
@@ -30,10 +30,10 @@ function Text(x, y, c, text){
 
     stage.addChild(this.container);
 }
-Text.prototype.display = function(){
+Tone.prototype.display = function(){
     createjs.Tween.get(this.container).to({scaleX:1, scaleY:1}, 300);
 };
-Text.prototype.noteOn = function(){
+Tone.prototype.noteOn = function(){
     var effect = new createjs.Shape();
     effect.graphics
         .beginStroke(this.color)
@@ -62,12 +62,12 @@ Text.prototype.noteOn = function(){
     this.container.addChild(effect);
     this.container.addChild(effectBlur);
 };
-Text.prototype.remove =  function(){
+Tone.prototype.remove =  function(){
     createjs.Tween.get(this.container,{override:true})
     .to({scaleX:0, scaleY:0}, 300)
     .call(function(){stage.removeChild(this)});
 };
-Text.prototype.move = function(_x, _y){
+Tone.prototype.move = function(_x, _y){
     createjs.Tween.get(this.container,{override:true})
     .to({x:_x, y:_y}, 100)
     .call(function(){this.x=_x;this.y=_y;});

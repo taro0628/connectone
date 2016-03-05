@@ -15,20 +15,20 @@ var moveObj = undefined;//クリックされたオブジェクト
 $(window).on('mousedown', function(event){
     var pt;
 
-    for(var i=0; i<objectList.length; i++){
-        pt = objectList[i].obj.container.globalToLocal(event.pageX, event.pageY);
-        //オブジェクトがクリックされたかを判定
-        if(objectList[i].obj.container.hitTest(pt.x, pt.y)){
+    for(var i=0; i<sequencerList.length; i++){
+        pt = sequencerList[i].component.container.globalToLocal(event.pageX, event.pageY);
+        //シーケンサーがクリックされたかを判定
+        if(sequencerList[i].component.container.hitTest(pt.x, pt.y)){
             isClick = true;
-            moveObj = objectList[i];
+            moveObj = sequencerList[i];
             return;
         }
-        //テキストも移動できるように判定
-        for(var j=0; j<objectList[i].textList.length; j++){
-            pt = objectList[i].textList[j].container.globalToLocal(event.pageX, event.pageY);
-            if(objectList[i].textList[j].container.hitTest(pt.x, pt.y)){
+        //トーンも移動できるように判定
+        for(var j=0; j<sequencerList[i].toneList.length; j++){
+            pt = sequencerList[i].toneList[j].container.globalToLocal(event.pageX, event.pageY);
+            if(sequencerList[i].toneList[j].container.hitTest(pt.x, pt.y)){
                 isClick = true;
-                moveObj = objectList[i].textList[j];
+                moveObj = sequencerList[i].toneList[j];
                 return;
             }
         }
@@ -48,15 +48,15 @@ $(window).on('mouseup', function(event){
     var target;
     //オブジェクトが動いていなければ削除する
     if(!isMoved){
-        for(var i=0; i<objectList.length; i++){
-            pt = objectList[i].obj.container.globalToLocal(event.pageX, event.pageY);
+        for(var i=0; i<sequencerList.length; i++){
+            pt = sequencerList[i].component.container.globalToLocal(event.pageX, event.pageY);
             //クリックした時にオブジェクトがあったら削除する
-            if(objectList[i].obj.container.hitTest(pt.x, pt.y)){
+            if(sequencerList[i].component.container.hitTest(pt.x, pt.y)){
                 //線の削除
-                deleteLine(objectList[i]);
+                deleteLine(sequencerList[i]);
                 //オブジェクトの削除
-                objectList[i].remove();
-                objectList.splice(i, 1);
+                sequencerList[i].remove();
+                sequencerList.splice(i, 1);
                 return;
             }
         }
@@ -70,19 +70,21 @@ $(window).on('mouseup', function(event){
         return;
     }
 
-    //画面に何もなければ新しくオブジェクトを作成
-    if(objectList.length == 0){
+    //画面に何もなければ新しくシーケンサーを作成
+    if(sequencerList.length == 0){
         createObj(event.pageX, event.pageY);
         return;
     }
 
-    //テキストをクリックした時にオブジェクトを追加する
-    for(var i=0; i<objectList.length; i++){
-        for (var j=0; j<objectList[i].textList.length; j++) {
-            var text = objectList[i].textList[j];
-            pt = text.container.globalToLocal(event.pageX, event.pageY);
-            if(text.container.hitTest(pt.x, pt.y)){
-                createObj(2*(text.x-objectList[i].x) + objectList[i].x, 3*(text.y-objectList[i].y) + objectList[i].y, text);
+    //トーンをクリックした時にシーケンサーを追加する
+    for(var i=0; i<sequencerList.length; i++){
+        for (var j=0; j<sequencerList[i].toneList.length; j++) {
+            var tone = sequencerList[i].toneList[j];
+            pt = tone.container.globalToLocal(event.pageX, event.pageY);
+            if(tone.container.hitTest(pt.x, pt.y)){
+                var _x = 3*(tone.x-sequencerList[i].x) + sequencerList[i].x;
+                var _y = 3*(tone.y-sequencerList[i].y) + sequencerList[i].y;
+                createObj(_x, _y, tone);
                 return;
             }
         }
@@ -90,57 +92,58 @@ $(window).on('mouseup', function(event){
 
 });
 
-function createObj(pageX, pageY, text){
+function createObj(pageX, pageY, tone){
 
-    objectList.push(new Obj(pageX, pageY, '#96bbb3', CirclePart));
-    objectList[objectList.length-1].display();
-    if(currentObj == undefined){
-        currentObj = objectList[objectList.length-1];
+    var seq = new Sequencer(pageX, pageY, '#96bbb3', Circle);
+    sequencerList.push(seq);
+    seq.display();
+    if(currentSeq == undefined){
+        currentSeq = seq;
     }
 
-    placeText(objectList[objectList.length-1], ['t1', 'test2', 'testaaaaaaaaa3'], pageX, pageY, 100)
+    placeTone(seq, ['t1', 'test2', 'testaaaaaaaaa3'], pageX, pageY, 100)
 
-    //他にオブジェクトがあれば線を引く
-    if(objectList.length>1){
-        //drawLine(objectList[objectList.length-1]);
-        lineList.push(new Line(objectList[objectList.length-1], text, '#fff'));
+    //他にシーケンサーがあれば線を引く
+    if(sequencerList.length>1){
+        lineList.push(new Line(seq, tone, '#fff'));
     }
 }
 
-function placeText(obj, textArray, x, y, r){
+function placeTone(sequencer, textArray, x, y, r){
     var divCount = textArray.length;
     var radianInterval = (2 * Math.PI) / divCount;
     var _x;
     var _y;
-    obj.r = r;
+    sequencer.r = r;
     for (var i = 0; i < divCount; i++) {
-        _x = r * Math.cos(radianInterval * i) + x
-        _y = r * Math.sin(radianInterval * i) + y
-        obj.textList.push(new Text(_x, _y, '#96bbb3', textArray[i]));
-        obj.textList[obj.textList.length-1].display();
-        obj.textList[obj.textList.length-1].connectedObjs.push(obj);
-        lineList.push(new Line(obj, obj.textList[obj.textList.length-1], '#fff'));
+        _x = r * Math.cos(radianInterval * i) + x;
+        _y = r * Math.sin(radianInterval * i) + y;
+        var tone = new Tone(_x, _y, '#96bbb3', textArray[i]);
+        sequencer.toneList.push(tone);
+        tone.display();
+        tone.connectedSeq.push(sequencer);
+        lineList.push(new Line(sequencer, tone, '#fff'));
     }
 }
 
 function tick() {
     var currentTime = ctx.currentTime;
 
-    for(var i=0; i<objectList.length; i++){
-        var objScore = objectList[i].score;
-        var objQueue = objectList[i].notesInQueue;
+    for(var i=0; i<sequencerList.length; i++){
+        var objScore = sequencerList[i].score;
+        var objQueue = sequencerList[i].notesInQueue;
         if (objQueue.length && objQueue[0].time < currentTime) {
 
-            objectList[i].noteOn();
+            sequencerList[i].noteOn();
             objQueue.splice(0,1);   // remove note from queue
         }
-        for (var j=0; j<objectList[i].textList.length; j++){
-            var textScore = objectList[i].textList[j].score;
-            var textQueue = objectList[i].textList[j].notesInQueue;
+        for (var j=0; j<sequencerList[i].toneList.length; j++){
+            var toneScore = sequencerList[i].toneList[j].score;
+            var toneQueue = sequencerList[i].toneList[j].notesInQueue;
 
-            if (textQueue.length && textQueue[0].time < currentTime) {
-                objectList[i].textList[j].noteOn();
-                textQueue.splice(0,1);   // remove note from queue
+            if (toneQueue.length && toneQueue[0].time < currentTime) {
+                sequencerList[i].toneList[j].noteOn();
+                toneQueue.splice(0,1);   // remove note from queue
             }
         }
     }
