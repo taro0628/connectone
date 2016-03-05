@@ -31,7 +31,8 @@ function scheduleNote( beatNumber, time ) {
         var dummy = ctx.createOscillator();
     }
     var synthQueue = [];
-    if(currentSeq != undefined){
+    for(var i=0; i<sequencerList.length; i++){
+        currentSeq = sequencerList[i];
         //オブジェクトのアニメーション用にキューに登録
         var seqScore = currentSeq.score;
         if (seqScore[beatNumber] != 0){
@@ -40,12 +41,12 @@ function scheduleNote( beatNumber, time ) {
 
         //ここから音を出す処理
         var _time;
-        for (var i = 0; i < currentSeq.toneList.length; i++) {
-            var tone = currentSeq.toneList[i];
+        for (var j = 0; j < currentSeq.toneList.length; j++) {
+            var tone = currentSeq.toneList[j];
             var toneQueue = tone.notesInQueue;
             var toneRecipe = tone.recipe;//音色
-            for (var j = 0; j < tone.connectedSeq.length; j++) {
-                var seq = tone.connectedSeq[j];
+            for (var k = 0; k < tone.connectedSeq.length; k++) {
+                var seq = tone.connectedSeq[k];
                 var score = seq.score;
                 if (score[beatNumber] != 0){
                     //距離によってタイミングを変更
