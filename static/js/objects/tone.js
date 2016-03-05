@@ -76,7 +76,7 @@ Tone.prototype.move = function(_x, _y){
 };
 
 function makeRecipe(text){
-    var len = Math.floor(Math.random() * 12);
+    var len = Math.random() * 9;
     len = text.length;
     if(len < 3){
         return recipe1;
@@ -90,7 +90,7 @@ function makeRecipe(text){
 }
 
 function makePitch(text){
-    len = text.length;
+    len = Math.random() * 9;
     if(len < 3){
         return 9;
     }else if(len < 6){

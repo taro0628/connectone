@@ -5,7 +5,7 @@ var tempo = 30.0;          // テンポ(BPM)
 var lookahead = 25.0;       // JSのタイマーが呼ばれる間隔(㎳)
 var scheduleAheadTime = 0.1;    // スケジューラが先読みする長さ(s)
 var nextNoteTime = 0.0;     // 次の音がなるタイミング
-var noteResolution = 1;     // 0 == 16th, 1 == 8th, 2 == quarter note
+var noteResolution = 0;     // 0 == 16th, 1 == 8th, 2 == quarter note
 var noteLength = 0.05;      // 音の長さ(in seconds)
 
 function nextNote() {
@@ -54,15 +54,17 @@ function scheduleNote( beatNumber, time ) {
                     var _y = tone.y - seq.y;
                     var dist = Math.sqrt(_x * _x + _y * _y);
                     _time = time + dist/1000;
-                    toneQueue.push( { note: beatNumber, time: _time } );
+                    if(toneQueue.time != _time){
+                        toneQueue.push( { note: beatNumber, time: _time } );
 
-                    //上書きしてしまわないように音源はキューで管理
-                    if(synthQueue.length>10){
-                        synthQueue.splice(0,1);
+                        //上書きしてしまわないように音源はキューで管理
+                        if(synthQueue.length>20){
+                            synthQueue.splice(0,1);
+                        }
+                        synthQueue.push(new Synth(ctx, toneRecipe));
+                        synthQueue[synthQueue.length-1].noteOn(tone.pitch, _time);
+                        synthQueue[synthQueue.length-1].noteOff(_time + noteLength);
                     }
-                    synthQueue.push(new Synth(ctx, toneRecipe));
-                    synthQueue[synthQueue.length-1].noteOn(tone.pitch, _time);
-                    synthQueue[synthQueue.length-1].noteOff(_time + noteLength);
                 }
             }
         }

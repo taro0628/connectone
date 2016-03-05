@@ -19,6 +19,7 @@
     <script src="/static/js/varList.js" charset="utf-8"></script>
     <script src="/static/js/objects/sequencer.js" charset="utf-8"></script>
     <script src="/static/js/objects/circle.js" charset="utf-8"></script>
+    <script src="/static/js/objects/rect.js" charset="utf-8"></script>
     <script src="/static/js/objects/line.js" charset="utf-8"></script>
     <script src="/static/js/objects/tone.js" charset="utf-8"></script>
     <script src="/static/js/scheduler.js" charset="utf-8"></script>

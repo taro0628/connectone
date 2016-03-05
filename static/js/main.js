@@ -79,9 +79,12 @@ $(window).on('mouseup', function(event){
             var tone = seq.toneList[j];
             pt = tone.container.globalToLocal(event.pageX, event.pageY);
             if(tone.container.hitTest(pt.x, pt.y)){
-                //すでに繋がれているシーケンサーとは逆位置に設置
-                var _x = 2*(tone.x-seq.x) + seq.x;
-                var _y = 2*(tone.y-seq.y) + seq.y;
+                var _x;
+                var _y;
+                var r = 90;
+                var random = 2*Math.PI * Math.random();
+                _x = r * Math.cos(random) + event.pageX;
+                _y = r * Math.sin(random) + event.pageY;
                 placeSequncer(_x, _y, tone);
                 isClick = false;
                 isMoved = false;
@@ -108,13 +111,15 @@ function placeSequncer(x, y, tone){
 //シーケンサーを設置する関数
 //トーンが指定されていれば設置したシーケンサーと繋ぐ
     tone = tone || undefined;
-
-    var seq = new Sequencer(x, y, '#96bbb3', Circle);
+    var rand = Math.random();
+    var component = rand>0.5 ? Rect : Circle;
+    var seq = new Sequencer(x, y, '#96bbb3', component);
     sequencerList.push(seq);
     seq.display();
 
     //トーンが指定されていれば線を引く
     if(tone != undefined){
+        tone.connectedSeq.push(seq);
         lineList.push(new Line(seq, tone, '#fff'));
     }
 }
