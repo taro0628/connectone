@@ -29,7 +29,6 @@ function Rect(x, y, c, isBlur){
         .setStrokeStyle(2)
         .drawRect(-30, -30, 60, 60);
 
-    this.rectBase.alpha = 0.01;
     this.container.x = x;
     this.container.y = y;
     this.container.scaleX = this.container.scaleY = 0;
@@ -46,7 +45,7 @@ function Rect(x, y, c, isBlur){
         this.rect3.cache(-50, -50, 100, 100);
     }
 
-    this.container.addChild(this.rectBase);
+    this.container.hitArea = this.rectBase;
     this.container.addChild(this.rect1);
     this.container.addChild(this.rect2);
     this.container.addChild(this.rect3);

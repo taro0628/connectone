@@ -6,103 +6,17 @@ function init() {
     var background = new createjs.Shape();
     background.graphics.beginFill('#0E0E0E').drawRect(0,0,windowWidth,windowHeight);
     stage.addChild(background);
+
+    createjs.EventDispatcher.initialize(Sequencer.prototype);
     createjs.Ticker.addEventListener('tick', tick);
 }
 
-$(window).on('mousedown', function(event){
-    var pt;
-
-    for(var i=0; i<sequencerList.length; i++){
-        var seq = sequencerList[i];
-        pt = seq.container.globalToLocal(event.pageX, event.pageY);
-        //シーケンサーがクリックされたかを判定
-        if(seq.container.hitTest(pt.x, pt.y)){
-            isClick = true;
-            moveObj = seq;
-            return;
-        }
-        //トーンも移動できるように判定
-        for(var j=0; j<seq.toneList.length; j++){
-            pt = seq.toneList[j].container.globalToLocal(event.pageX, event.pageY);
-            if(seq.toneList[j].container.hitTest(pt.x, pt.y)){
-                isClick = true;
-                moveObj = seq.toneList[j];
-                return;
-            }
-        }
-    }
-});
-$(window).on('mousemove', function(event){
-    //オブジェクトがクリックされていたら移動処理をする
-    if(isClick){
-        moveObj.move(event.pageX, event.pageY);
-        isMoved = true;
-    }
-});
 
 $(window).on('mouseup', function(event){
-    var pt;
-    //オブジェクトが動いていなければ削除する
-    /*if(!isMoved){
-        for(var i=0; i<sequencerList.length; i++){
-            pt = sequencerList[i].component.container.globalToLocal(event.pageX, event.pageY);
-            //クリックした時にオブジェクトがあったら削除する
-            if(sequencerList[i].component.container.hitTest(pt.x, pt.y)){
-                //線の削除
-                deleteLine(sequencerList[i]);
-                //オブジェクトの削除
-                sequencerList[i].remove();
-                sequencerList.splice(i, 1);
-                return;
-            }
-        }
-    }*/
-
-    //移動モードを解除
-    if(isMoved){
-        moveObj.move(event.pageX, event.pageY);
-        isClick = false;
-        isMoved = false;
-        return;
-    }
-
     //画面に何もなければ新しくシーケンサーを作成
     if(sequencerList.length == 0){
         placeSequncer(event.pageX, event.pageY);
         return;
-    }
-
-    //トーンをクリックした時にシーケンサーを追加する
-    for(var i=0; i<sequencerList.length; i++){
-        var seq = sequencerList[i];
-        for (var j=0; j<seq.toneList.length; j++) {
-            var tone = seq.toneList[j];
-            pt = tone.container.globalToLocal(event.pageX, event.pageY);
-            if(tone.container.hitTest(pt.x, pt.y)){
-                var _x;
-                var _y;
-                var r = 90;
-                var random = 2*Math.PI * Math.random();
-                _x = r * Math.cos(random) + event.pageX;
-                _y = r * Math.sin(random) + event.pageY;
-                placeSequncer(_x, _y, tone);
-                isClick = false;
-                isMoved = false;
-                return;
-            }
-        }
-    }
-
-    //シーケンサーをクリックした時にトーンを追加する
-    for(var i=0; i<sequencerList.length; i++){
-            var seq = sequencerList[i];
-            pt = seq.container.globalToLocal(event.pageX, event.pageY);
-            if(seq.container.hitTest(pt.x, pt.y)){
-                placeTone(seq, 'test', event.pageX, event.pageY, 90);
-                isClick = false;
-                isMoved = false;
-                return;
-            }
     }
 
 });
@@ -115,6 +29,9 @@ function placeSequncer(x, y, tone){
     var component = rand>0.5 ? Rect : Circle;
     var seq = new Sequencer(x, y, '#96bbb3', component);
     sequencerList.push(seq);
+    //seq.on('mousedown', seq.mousedown);
+    //seq.on('pressmove', seq.mousemove);
+    //seq.on('pressup', seq.mouseup);
     seq.display();
 
     //トーンが指定されていれば線を引く

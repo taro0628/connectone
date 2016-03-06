@@ -7,6 +7,10 @@ function Tone(x, y, c, text){
     this.recipe = makeRecipe(text);
     this.pitch = makePitch(text);
     this.container = new createjs.Container();
+    this.container.on('mousedown', this.mousedown, this);
+    this.container.on('pressmove', this.mousemove, this);
+    this.container.on('pressup', this.mouseup, this);
+    this.isMoved = false;
 
     this.connectedSeq = [];
 
@@ -73,6 +77,28 @@ Tone.prototype.move = function(_x, _y){
     .call(function(){this.x=_x;this.y=_y;});
     this.x = _x;
     this.y = _y;
+};
+
+Tone.prototype.mousedown = function(event){
+    var tone = this;
+};
+Tone.prototype.mousemove = function(event){
+    var tone = this;
+    tone.move(event.stageX, event.stageY);
+    tone.isMoved = true;
+};
+Tone.prototype.mouseup = function(event){
+    var tone = this;
+    if(!tone.isMoved){
+        var _x;
+        var _y;
+        var r = 90;
+        var random = 2*Math.PI * Math.random();
+        _x = r * Math.cos(random) + event.stageX;
+        _y = r * Math.sin(random) + event.stageY;
+        placeSequncer(_x, _y, tone);
+    }
+    tone.isMoved = false;
 };
 
 function makeRecipe(text){

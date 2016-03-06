@@ -44,11 +44,9 @@ function Circle(x, y, c, isBlur){
         .setStrokeStyle(1)
         .arc(0,0,35,Math.PI*1.5,Math.PI*2);
 
-    this.circleBase.alpha = 0.01;
     this.container.x = x;
     this.container.y = y;
     this.container.scaleX = this.container.scaleY = 0;
-
 
     if(isBlur){
     var blurFilter = new createjs.BlurFilter(0, 0, 2);
@@ -67,7 +65,7 @@ function Circle(x, y, c, isBlur){
         this.circle6.cache(-100, -100, 200, 200);
     }
 
-    this.container.addChild(this.circleBase);
+    this.container.hitArea = this.circleBase;
     this.container.addChild(this.circle1);
     this.container.addChild(this.circle2);
     this.container.addChild(this.circle3);

@@ -51,18 +51,20 @@ Line.prototype.update = function(){
         var sy = this.sy = this.start.y;
         var tx = this.tx = this.target.x;
         var ty = this.ty = this.target.y;
-
-        createjs.Tween.get(this.startLine)
-        .to({x:sx,y:sy}, 10);
-        createjs.Tween.get(this.targetLine)
-        .to({x:tx,y:ty},10)
-        .call(function(_lineBlur){
+        var blurUpdate = function(_lineBlur){
             var _sx;
             var _sy;
             if(sx>tx){_sx=tx;}else{_sx=sx;}
             if(sy>ty){_sy=ty;}else{_sy=sy;}
             _lineBlur.cache(_sx, _sy, Math.abs(tx-sx), Math.abs(ty-sy));
-        },[this.lineBlur]);
+        };
+
+        createjs.Tween.get(this.startLine)
+        .to({x:sx,y:sy}, 10)
+        .call(blurUpdate,[this.lineBlur]);
+        createjs.Tween.get(this.targetLine)
+        .to({x:tx,y:ty},10)
+        .call(blurUpdate,[this.lineBlur]);
     }
 };
 
