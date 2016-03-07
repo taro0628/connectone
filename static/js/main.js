@@ -7,6 +7,13 @@ function init() {
     background.graphics.beginFill('#0E0E0E').drawRect(0,0,windowWidth,windowHeight);
     stage.addChild(background);
 
+    var data = {};
+    data.images = ['static/img/loading.png'];
+    data.frames = {width:100, height:100, regX:50, regY:50};
+    data.animations = {load: [0, 16]};
+    var loadingIconSheet = new createjs.SpriteSheet(data);
+    loadingIcon = new createjs.Sprite(loadingIconSheet);
+
     createjs.EventDispatcher.initialize(Sequencer.prototype);
     createjs.Ticker.addEventListener('tick', tick);
 }
@@ -21,6 +28,15 @@ $(window).on('mouseup', function(event){
 
 });
 function placeSequncer(x, y, tone) {
+
+    loadingIcon.x = x;
+    loadingIcon.y = y;
+    loadingIcon.scaleX = 0;
+    loadingIcon.scaleY = 0;
+    loadingIcon.gotoAndPlay("load");
+    stage.addChild(loadingIcon);
+    createjs.Tween.get(loadingIcon)
+        .to({scaleX: 0.7, scaleY: 0.7}, 100);
 
     //スクリーンネームからそのユーザが呟いた中で頻出単語を取得
     var getTweet = function(screenName){
@@ -109,7 +125,11 @@ function placeSequncer(x, y, tone) {
     .done(function(words){
         console.log(words)
         //アイコン画像、頻出単語が揃ったのでシーケンサーを作成
-        createSequncer(x, y, tone, words, iconSrc);
+        createjs.Tween.get(loadingIcon)
+            .to({scaleX: 0, scaleY: 0}, 100)
+            .call(function(x, y, tone, words, iconSrc){
+                createSequncer(x, y, tone, words, iconSrc);
+            },[x, y, tone, words, iconSrc]);
     })
     .fail(function() {
         console.log('Error');
