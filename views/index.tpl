@@ -13,8 +13,7 @@
     <script src="/static/js/jquery-2.2.0.min.js" charset="utf-8"></script>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>
     <script src="https://code.createjs.com/tweenjs-0.6.2.min.js"></script>
-    <script src="/static/js/recipe.js
-    " charset="utf-8"></script>
+    <script src="/static/js/recipe.js" charset="utf-8"></script>
     <script src="/static/js/audio.js" charset="utf-8"></script>
     <script src="/static/js/varList.js" charset="utf-8"></script>
     <script src="/static/js/objects/sequencer.js" charset="utf-8"></script>
@@ -23,6 +22,7 @@
     <script src="/static/js/objects/line.js" charset="utf-8"></script>
     <script src="/static/js/objects/tone.js" charset="utf-8"></script>
     <script src="/static/js/scheduler.js" charset="utf-8"></script>
+    <script src="/static/js/ajax.js" charset="utf-8"></script>
     <script src="/static/js/main.js" charset="utf-8"></script>
 </body>
 </html>

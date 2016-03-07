@@ -9,6 +9,8 @@ function init() {
 
     createjs.EventDispatcher.initialize(Sequencer.prototype);
     createjs.Ticker.addEventListener('tick', tick);
+
+    getTweet();
 }
 
 
@@ -85,21 +87,4 @@ function tick() {
         lineList[i].update();
     }
     stage.update();
-}
-
-function updateHtml() {
-  $.ajax({
-    type: 'GET',
-    url: 'http://localhost:8001/relation',
-    dataType: 'html',
-    success: function(response) {
-        console.log(response);
-    },
-    error: function() {
-        console.log('えらぁ');
-    },
-    complete: function() {
-        console.log('こんぷりーと');
-    }
-  });
 }
