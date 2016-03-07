@@ -14,6 +14,7 @@ function Tone(x, y, c, text){
 
     this.connectedSeq = [];
 
+    this.text = text;
     this.string = new createjs.Text(text, "20px Arial", c);
     this.circleBase = new createjs.Shape();
 

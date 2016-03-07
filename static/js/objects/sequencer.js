@@ -1,4 +1,4 @@
-function Sequencer(x, y, c, component){
+function Sequencer(x, y, c, component, words, iconSrc){
     this.x = x;
     this.y = y;
     this.color = c;
@@ -8,12 +8,20 @@ function Sequencer(x, y, c, component){
     this.container.on('pressmove', this.mousemove, this);
     this.container.on('pressup', this.mouseup, this);
     this.isMoved = false;
+
+    var icon = new createjs.Bitmap(iconSrc);
+    icon.x = -icon.getBounds().width/2;
+    icon.y = -icon.getBounds().height/2;
+    this.container.addChild(icon);
+
     this.componentBlur = new component(x, y, c, true);
 
     this.toneList = [];
 
     this.score = this.component.score;
     this.notesInQueue = [];
+
+    this.words = words;
 }
 Sequencer.prototype.display = function(){
     this.component.display();
@@ -47,7 +55,9 @@ Sequencer.prototype.mouseup = function(event){
     var seq = this;
     //移動モードを解除
     if(!seq.isMoved){
-        placeTone(seq, 'test', seq.x, seq.y, 90);
+        rand = Math.floor(Math.random() * this.words.length);
+        text = this.words[rand];
+        placeTone(seq, text, seq.x, seq.y, 90);
     }
     seq.isMoved = false;
 };
