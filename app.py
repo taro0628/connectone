@@ -8,6 +8,7 @@ from collections import defaultdict
 from io     import BytesIO
 from PIL    import Image
 import requests
+import random
 
 with open("secret.json") as f:
     secretjson = json.load(f)
@@ -58,8 +59,10 @@ def getName(text):
     auth = OAuth(secretjson["access_token"], secretjson["access_token_secret"], secretjson["consumer_key"], secretjson["consumer_secret"])
     t = Twitter(auth = auth)
 
-    result = t.search.tweets(q = text)
-    screen_name = result['statuses'][0]['user']['screen_name']
+    result = t.search.tweets(q = text, lang = 'ja', count = 100)
+    rand = random.randint(0, 99)
+    print(rand)
+    screen_name = result['statuses'][rand]['user']['screen_name']
 
     return screen_name
 
@@ -97,6 +100,7 @@ def getTweet(screen_name):
         mecab.parse('')
         node = mecab.parseToNode(text)
         while node:
+            print('{0}, {1}'.format(node.surface, node.feature))
             word = node.surface
             pos = node.feature.split(",")[1]
             if pos == "固有名詞" and len(word) != 1:

@@ -7,9 +7,8 @@ function Tone(x, y, c, text){
     this.recipe = makeRecipe(text);
     this.pitch = makePitch(text);
     this.container = new createjs.Container();
-    this.container.on('mousedown', this.mousedown, this);
-    this.container.on('pressmove', this.mousemove, this);
-    this.container.on('pressup', this.mouseup, this);
+    this.container.on('pressmove', this.pressmove, this);
+    this.container.on('pressup', this.pressup, this);
     this.isMoved = false;
 
     this.connectedSeq = [];
@@ -80,15 +79,12 @@ Tone.prototype.move = function(_x, _y){
     this.y = _y;
 };
 
-Tone.prototype.mousedown = function(event){
-    var tone = this;
-};
-Tone.prototype.mousemove = function(event){
+Tone.prototype.pressmove = function(event){
     var tone = this;
     tone.move(event.stageX, event.stageY);
     tone.isMoved = true;
 };
-Tone.prototype.mouseup = function(event){
+Tone.prototype.pressup = function(event){
     var tone = this;
     if(!tone.isMoved){
         var _x;
@@ -101,6 +97,22 @@ Tone.prototype.mouseup = function(event){
     }
     tone.isMoved = false;
 };
+
+function placeTone(sequencer, text, x, y, r){
+    //トーンを設置する関数
+      var _x;
+      var _y;
+      var random = 2.5*Math.PI * Math.random();
+      sequencer.r = r;
+      _x = r * Math.cos(random) + x;
+      _y = r * Math.sin(random) + y;
+      var tone = new Tone(_x, _y, '#96bbb3', text);
+      sequencer.toneList.push(tone);
+      tone.display();
+      tone.connectedSeq.push(sequencer);
+      lineList.push(new Line(sequencer, tone, '#fff'));
+
+}
 
 function makeRecipe(text){
     var len = Math.random() * 9;
