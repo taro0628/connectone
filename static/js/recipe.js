@@ -5,17 +5,17 @@ var bassdrum = {
         name: 'Env',
         param:{
             gain: 3,
-            attack: 0,
+            attack: 0.01,
             decay: 0.2,
             sustain: 0,
-            release: 0.01,
+            release: 0.1,
         },
         input: {
             name: 'Mixer',
             input1: {
                 name: 'VCF',
                 param: {
-                    frequency: 400,
+                    frequency: 4000,
                     type: 'bandpass',
                     Q: 9,
                     gain: 1
@@ -42,10 +42,10 @@ var snare = {
         name: 'Env',
         param:{
             gain: 3,
-            attack: 0,
+            attack: 0.01,
             decay: 0.2,
             sustain: 0,
-            release: 0.01,
+            release: 0.1,
         },
         input: {
             name: 'Mixer',
@@ -79,10 +79,10 @@ var highhat = {
         name: 'Env',
         param:{
             gain: 3,
-            attack: 0,
+            attack: 0.01,
             decay: 0.2,
             sustain: 0,
-            release: 0.01,
+            release: 0.1,
         },
         input: {
             name: 'VCF',

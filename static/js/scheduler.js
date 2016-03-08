@@ -1,12 +1,13 @@
 var startTime;              // 開始時刻
 var current16thNote = 0;        // 1小節のうち何番目の音か（1小節に最大16個）
 var last16thNoteDrawn = -1; // the last "box" we drew on the screen
-var tempo = 30.0;          // テンポ(BPM)
+var tempo = 60.0;          // テンポ(BPM)
 var lookahead = 25.0;       // JSのタイマーが呼ばれる間隔(㎳)
 var scheduleAheadTime = 0.1;    // スケジューラが先読みする長さ(s)
 var nextNoteTime = 0.0;     // 次の音がなるタイミング
 var noteResolution = 0;     // 0 == 16th, 1 == 8th, 2 == quarter note
-var noteLength = 0.05;      // 音の長さ(in seconds)
+var noteLength = 0.3;      // 音の長さ(in seconds)
+var currentSeqNum = 0;
 
 function nextNote() {
 
