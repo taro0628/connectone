@@ -17,16 +17,11 @@ function init() {
 
     createjs.EventDispatcher.initialize(Sequencer.prototype);
     createjs.Ticker.addEventListener('tick', tick);
+
+    placeSequncer(windowWidth/2, windowHeight/2);
+    currentSeq = sequencerList[0];
 }
 
-$(window).on('mouseup', function(event){
-    //画面に何もなければ新しくシーケンサーを作成
-    if(sequencerList.length == 0){
-        placeSequncer(event.pageX, event.pageY);
-        return;
-    }
-
-});
 
 function tick() {
     var currentTime = ctx.currentTime;
