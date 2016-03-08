@@ -38,7 +38,7 @@ function placeSequncer(x, y, tone) {
     createjs.Tween.get(loadingIcon)
         .to({scaleX: 0.7, scaleY: 0.7}, 100);
 
-    //スクリーンネームからそのユーザが呟いた中で頻出単語を取得
+    //スクリーンネームで指定したユーザが呟いた固有名詞を取得
     var getTweet = function(screenName){
         return $.ajax({
             type: 'GET',
