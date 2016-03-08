@@ -16,6 +16,7 @@ function Synth(ctx, recipe){
     this.addNode('Env', this.setEnv, 'Env');
     this.addNode('VCA', this.setVCA);
     this.addNode('VCF', this.setVCF);
+    this.addNode('Noise', this.setNoise);
 
     this.initSynth();
 }
@@ -188,6 +189,23 @@ Synth.prototype.setVCF = function(synth, currentNode, destNode, node) {
     }
     //VCFノードをdestNodeに接続
     vcf.connect(destNode);
+    currentNode['state'] = true;
+};
+
+Synth.prototype.setNoise = function(synth, currentNode, destNode, node) {
+    var bufsize = 1024;
+    var short_flag = 0;
+    var reg = 0x8000;
+    var noise = synth.createNode(currentNode, node, synth.ctx.createScriptProcessor(bufsize));
+    noise.onaudioprocess = function(ev){
+        var buf0 = ev.outputBuffer.getChannelData(0);
+        var buf1 = ev.outputBuffer.getChannelData(1);
+        for(var i = 0; i < bufsize; ++i)
+            buf0[i] = buf1[i] = (Math.random() - 0.5);
+    };
+
+    //Noiseノードの設定が終わったのでdestNodeに接続
+    noise.connect(destNode);
     currentNode['state'] = true;
 };
 
