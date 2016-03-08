@@ -6,10 +6,12 @@ function Tone(x, y, c, text){
     this.notesInQueue = [];
     this.recipe = makeRecipe(text);
     this.pitch = makePitch(text);
+    this.score = makeScore(text);
     this.container = new createjs.Container();
     this.container.on('pressmove', this.pressmove, this);
     this.container.on('pressup', this.pressup, this);
     this.isMoved = false;
+    this.synth = new Synth(ctx, this.recipe);
 
     this.connectedSeq = [];
 
