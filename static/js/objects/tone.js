@@ -115,16 +115,27 @@ function placeTone(sequencer, text, x, y, r){
 }
 
 function makeRecipe(text){
-    var len = Math.random() * 9;
-    len = text.length;
-    if(len < 3){
-        return recipe1;
-    }else if(len < 6){
-        return recipe2;
-    }else if(len < 9){
-        return recipe3;
+    var _text = window.btoa(encodeURI(text));
+    var num = 0;
+    for (var i = 0; i < _text.length; i++) {
+        num += _text.charCodeAt(i);
+    }
+
+    var len = text.length;
+    if(num < 1000){
+        return bassdrum;
+    }else if(num < 2000){
+        return snare;
+    }else if(num < 3000){
+        return highhat;
+    }else if(num < 4000){
+        return tone1;
+    }else if(num < 5000){
+        return tone2;
+    }else if(num < 6000){
+        return tone3;
     }else{
-        return recipe1;
+        return highhat;
     }
 }
 

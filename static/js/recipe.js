@@ -1,4 +1,4 @@
-var recipe1 = {
+var bassdrum = {
     name: 'VCA',
     gain: 0.9,
     input: {
@@ -35,7 +35,7 @@ var recipe1 = {
     }
 };
 
-var recipe2 = {
+var snare = {
     name: 'VCA',
     gain: 0.9,
     input: {
@@ -72,7 +72,7 @@ var recipe2 = {
     }
 };
 
-var recipe3 = {
+var highhat = {
     name: 'VCA',
     gain: 0.9,
     input: {
@@ -94,6 +94,99 @@ var recipe3 = {
             },
             input: {
                 name: 'Noise'
+            }
+        }
+    }
+};
+
+var tone1 = {
+    name: 'VCA',
+    gain: 0.9,
+    input: {
+        name: 'Env',
+        param:{
+            gain: 2,
+            attack: 0.3,
+            decay: 0.2,
+            sustain: 0.5,
+            release: 0.1,
+        },
+        input: {
+            name: 'VCF',
+            param: {
+                frequency: 400,
+                type: 'bandpass',
+                Q: 8,
+                gain: 1
+            },
+            input: {
+                name: 'VCO',
+                param: {
+                    frequency: 'cv',
+                    type: 'triangle'
+                }
+            }
+        }
+    }
+};
+
+var tone2 = {
+    name: 'VCA',
+    gain: 0.9,
+    input: {
+        name: 'Env',
+        param:{
+            gain: 2,
+            attack: 0.3,
+            decay: 0.2,
+            sustain: 0.5,
+            release: 0.1,
+        },
+        input: {
+            name: 'VCF',
+            param: {
+                frequency: 400,
+                type: 'bandpass',
+                Q: 8,
+                gain: 1
+            },
+            input: {
+                name: 'VCO',
+                param: {
+                    frequency: 'cv',
+                    type: 'square'
+                }
+            }
+        }
+    }
+};
+
+var tone3 = {
+    name: 'VCA',
+    gain: 0.9,
+    input: {
+        name: 'Env',
+        param:{
+            gain: 2,
+            attack: 0.3,
+            decay: 0.2,
+            sustain: 0.5,
+            release: 0.1,
+        },
+        input: {
+            name: 'VCF',
+            param: {
+                frequency: 400,
+                type: 'bandpass',
+                Q: 8,
+                gain: 1
+            },
+            input: {
+                name: 'VCO',
+                param: {
+                    frequency: 'cv',
+                    type: 'sawtooth'
+                }
             }
         }
     }

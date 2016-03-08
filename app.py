@@ -82,7 +82,7 @@ def filter(text):
         text = text.split("http", 1)[0]
     return text
 
-#スクリーンネームで指定したユーザのつぶやき中の固有名詞を取得
+#スクリーンネームで指定したユーザの頻出単語を取得
 @route('/tweet/words/<screen_name>')
 def getTweet(screen_name):
     mecab = MeCab.Tagger ('-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd')
@@ -93,7 +93,7 @@ def getTweet(screen_name):
 
     #ツイートを取得
     timeline = t.statuses.user_timeline(screen_name = screen_name, count = 200)
-    resultList = []
+    word2freq = defaultdict(int)
     for tweet in timeline:
         # 形態素解析
         text = filter(tweet['text'])
@@ -103,9 +103,14 @@ def getTweet(screen_name):
             print('{0}, {1}'.format(node.surface, node.feature))
             word = node.surface
             pos = node.feature.split(",")[1]
+            print(pos)
             if pos == "固有名詞" and len(word) != 1:
-                resultList.append(word)
+                word2freq[word] += 1
             node = node.next
+    sorted_word2freq = sorted(word2freq.items(), key=lambda x:x[1], reverse=True)
+    resultList = []
+    for item in sorted_word2freq:
+        resultList.append(item[0])
 
     #結果はJSON形式で返す
     return json.dumps(resultList, ensure_ascii=False)

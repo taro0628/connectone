@@ -5,7 +5,6 @@ function Circle(x, y, c, isBlur){
     this.color = c;
     this.score = [9,0,0,0, 9,0,0,0, 9,0,0,0, 9,0,0,0];
     this.notesInQueue = [];
-    this.recipe = recipe1;
     this.container = new createjs.Container();
 
     this.circleBase = new createjs.Shape();

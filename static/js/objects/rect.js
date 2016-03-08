@@ -5,7 +5,6 @@ function Rect(x, y, c, isBlur){
     this.color = c;
     this.score = [9,0,9,0, 9,0,9,0, 9,0,9,0, 9,0,9,0];
     this.notesInQueue = [];
-    this.recipe = recipe1;
     this.container = new createjs.Container();
 
     this.rectBase = new createjs.Shape();
