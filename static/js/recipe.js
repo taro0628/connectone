@@ -12,25 +12,27 @@ var bassdrum = {
         },
         input: {
             name: 'Mixer',
-            input1: {
-                name: 'VCF',
-                param: {
-                    frequency: 4000,
-                    type: 'bandpass',
-                    Q: 9,
-                    gain: 1
+            input: [
+                {
+                    name: 'VCF',
+                    param: {
+                        frequency: 4000,
+                        type: 'bandpass',
+                        Q: 9,
+                        gain: 1
+                    },
+                    input: {
+                        name: 'Noise'
+                    }
                 },
-                input: {
-                    name: 'Noise'
+                {
+                    name: 'VCO',
+                    param: {
+                        frequency: 60,
+                        type: 'sine'
+                    }
                 }
-            },
-            input2: {
-                name: 'VCO',
-                param: {
-                    frequency: 60,
-                    type: 'sine'
-                }
-            }
+            ]
         }
     }
 };
@@ -49,25 +51,27 @@ var snare = {
         },
         input: {
             name: 'Mixer',
-            input1: {
-                name: 'VCF',
-                param: {
-                    frequency: 1000,
-                    type: 'bandpass',
-                    Q: 5,
-                    gain: 1
+            input: [
+                {
+                    name: 'VCF',
+                    param: {
+                        frequency: 1000,
+                        type: 'bandpass',
+                        Q: 5,
+                        gain: 1
+                    },
+                    input: {
+                        name: 'Noise'
+                    }
                 },
-                input: {
-                    name: 'Noise'
+                {
+                    name: 'VCO',
+                    param: {
+                        frequency: 50,
+                        type: 'sine'
+                    }
                 }
-            },
-            input2: {
-                name: 'VCO',
-                param: {
-                    frequency: 50,
-                    type: 'sine'
-                }
-            }
+            ]
         }
     }
 };

@@ -61,22 +61,17 @@ Synth.prototype.noteNoTofreq = function (noteNo){
 
 Synth.prototype.setMixer = function(synth, currentNode, destNode, node) {
 
-    var input1 = currentNode['input1'];
-    var input2 = currentNode['input2'];
+    var input = currentNode['input'];
     //Mixerに接続されるノードの設定が終わっていなければ設定する
-    if (input1['state']==undefined){
-        synth.setSynth(input1, destNode);
+    for (var i = 0; i < input.length; i++) {
+        synth.setSynth(input[i], destNode);
     }
-    if (input2['state']==undefined){
-        synth.setSynth(input2, destNode);
+    //ここまでくればinputの設定が終わっているのでdestNodeに接続
+    for (var i = 0; i < input.length; i++) {
+        synth.nodeManager[input[i]['name']].nodeList[input[i]['id']].connect(destNode);
     }
-    //ここまでくればinput1もinput2も設定が終わっているのでdestNodeに接続
-    if (input1['state']==true && input2['state']==true){
-        synth.nodeManager[input1['name']].nodeList[input1['id']].connect(destNode);
-        synth.nodeManager[input2['name']].nodeList[input2['id']].connect(destNode);
-        currentNode['status'] = true;
-        return ;
-    }
+    currentNode['status'] = true;
+    return ;
 };
 
 Synth.prototype.setVCO = function(synth, currentNode, destNode, node) {
