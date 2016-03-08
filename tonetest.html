@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>tonetest</title>
+    <link href="static/css/reset.css" rel="stylesheet" type="text/css">
+    <link href="static/css/index.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+    <script src="static/js/jquery-2.2.0.min.js" charset="utf-8"></script>
+    <script src="static/js/recipe.js" charset="utf-8"></script>
+    <script src="static/js/audio.js" charset="utf-8"></script>
+    <script>
+        $(function(){
+            var AudioContext = window.AudioContext || window.webkitAudioContext;
+            var ctx = new AudioContext();
+
+            $(window).on('click', function(){
+                var tone = new Synth(ctx, recipe1);
+                var now = ctx.currentTime;
+                tone.noteOn(9, now);
+                tone.noteOff(now + 1);
+            });
+        });
+    </script
+</body>
+</html>

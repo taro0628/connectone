@@ -19,7 +19,6 @@ function init() {
     createjs.Ticker.addEventListener('tick', tick);
 }
 
-
 $(window).on('mouseup', function(event){
     //画面に何もなければ新しくシーケンサーを作成
     if(sequencerList.length == 0){

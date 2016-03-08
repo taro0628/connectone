@@ -22,7 +22,6 @@
     <script src="/static/js/objects/line.js" charset="utf-8"></script>
     <script src="/static/js/objects/tone.js" charset="utf-8"></script>
     <script src="/static/js/scheduler.js" charset="utf-8"></script>
-    <script src="/static/js/ajax.js" charset="utf-8"></script>
     <script src="/static/js/main.js" charset="utf-8"></script>
 </body>
 </html>
