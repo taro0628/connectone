@@ -15,7 +15,7 @@ function Sequencer(x, y, c, component, words, iconSrc){
 
     this.componentBlur = new component(x, y, c, true);
 
-    this.toneList = [];
+    this.connectedTone = [];
 
     this.score = this.component.score;
     this.notesInQueue = [];
@@ -32,9 +32,6 @@ Sequencer.prototype.noteOn = function(){
 Sequencer.prototype.remove = function(){
     this.component.remove();
     this.componentBlur.remove();
-    for (var i = 0; i < this.toneList.length; i++) {
-        this.toneList[i].remove();
-    }
 };
 Sequencer.prototype.move = function(x, y){
     this.x = x;
@@ -51,14 +48,37 @@ Sequencer.prototype.pressup = function(event){
     var seq = this;
     //移動モードを解除
     if(!seq.isMoved){
-        rand = Math.floor(Math.random() * this.words.length);
-        text = this.words[rand];
-        //一度使った単語はもう使わない
-        this.words.splice(rand,1);
-        placeTone(seq, text, seq.x, seq.y, 90);
+        if(event.nativeEvent.button == 2){
+            deleteSequencer(seq);
+        }else{
+            text = seq.words[0];
+            //一度使った単語はもう使わない
+            seq.words.splice(0, 1);
+            placeTone(seq, text, seq.x, seq.y, 90);
+        }
     }
     seq.isMoved = false;
 };
+
+function deleteSequencer(seq){
+    for (var i = 0; i < seq.connectedTone.length; i++) {
+        var count = $.inArray(seq, seq.connectedTone[i].connectedSeq);
+        seq.connectedTone[i].connectedSeq.splice(count, 1);
+        console.log('test1')
+        //つながっているトーンにシーケンサーがなくなればトーンも消す
+        if(seq.connectedTone[i].connectedSeq.length == 0){
+            console.log('test2')
+            deleteTone(seq.connectedTone[i]);
+        }
+    }
+    deleteLine(seq);
+    var count = $.inArray(seq, sequencerList);
+    sequencerList.splice(count, 1);
+    if(sequencerList.length == 0){
+        currentSeq = undefined;
+    }
+    seq.remove();
+}
 
 function placeSequncer(x, y, tone) {
 
@@ -183,6 +203,9 @@ function createSequncer(x, y, tone, words, iconSrc){
 
     //トーンが指定されていれば線を引く
     if(tone != undefined){
+        //トーンを登録
+        seq.connectedTone.push(tone)
+
         tone.connectedSeq.push(seq);
         lineList.push(new Line(seq, tone, '#fff'));
     }

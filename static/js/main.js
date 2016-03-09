@@ -20,8 +20,19 @@ function init() {
 
     placeSequncer(windowWidth/2, windowHeight/2);
     currentSeq = sequencerList[0];
-}
 
+}
+document.oncontextmenu = function(){
+    return false;
+};
+
+$(window).on('click', function(event){
+    console.log(currentSeq)
+    if(currentSeq == undefined){
+        placeSequncer(event.pageX, event.pageY);
+        currentSeq = sequencerList[0];
+    }
+});
 
 function tick() {
     var currentTime = ctx.currentTime;
@@ -36,12 +47,12 @@ function tick() {
             seq.noteOn();
             seqQueue.splice(0,1);
         }
-        for (var j=0; j<seq.toneList.length; j++){
-            var toneScore = seq.toneList[j].score;
-            var toneQueue = seq.toneList[j].notesInQueue;
+        for (var j=0; j<seq.connectedTone.length; j++){
+            var toneScore = seq.connectedTone[j].score;
+            var toneQueue = seq.connectedTone[j].notesInQueue;
             //トーンのキューの時間が過ぎていればエフェクトを再生
             if (toneQueue.length && toneQueue[0].time < currentTime) {
-                seq.toneList[j].noteOn();
+                seq.connectedTone[j].noteOn();
                 toneQueue.splice(0,1);
             }
         }

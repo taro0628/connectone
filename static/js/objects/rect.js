@@ -3,7 +3,7 @@ function Rect(x, y, c, isBlur){
     this.x = x;
     this.y = y;
     this.color = c;
-    this.score = [9,0,9,0, 9,0,9,0, 9,0,9,0, 9,0,9,0];
+    this.score = [9,0,0,0, 9,0,0,0, 9,0,0,0, 9,0,0,0];
     this.notesInQueue = [];
     this.container = new createjs.Container();
 

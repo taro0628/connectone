@@ -6,7 +6,7 @@ var lookahead = 25.0;       // JSのタイマーが呼ばれる間隔(㎳)
 var scheduleAheadTime = 0.1;    // スケジューラが先読みする長さ(s)
 var nextNoteTime = 0.0;     // 次の音がなるタイミング
 var noteResolution = 0;     // 0 == 16th, 1 == 8th, 2 == quarter note
-var noteLength = 0.3;      // 音の長さ(in seconds)
+var noteLength = 0.1;      // 音の長さ(in seconds)
 var currentSeqNum = 0;
 
 function nextNote() {
@@ -21,7 +21,7 @@ function nextNote() {
         if(sequencerList.length != 0){
             currentSeqNum++;
         }
-        if (currentSeqNum == sequencerList.length) {
+        if (currentSeqNum >= sequencerList.length) {
             currentSeqNum = 0;
         }
         currentSeq = sequencerList[currentSeqNum];
@@ -49,27 +49,25 @@ function scheduleNote( beatNumber, time ) {
 
     //ここから音を出す処理
     var _time;
-    for (var j = 0; j < currentSeq.toneList.length; j++) {
-        var tone = currentSeq.toneList[j];
+    for (var j = 0; j < currentSeq.connectedTone.length; j++) {
+        var tone = currentSeq.connectedTone[j];
         var toneQueue = tone.notesInQueue;
         var toneRecipe = tone.recipe;//音色
         var toneScore = tone.score;
-        for (var k = 0; k < tone.connectedSeq.length; k++) {
-            var seq = tone.connectedSeq[k];
-            var score = seq.score;
-            if (score[beatNumber] != 0 && toneScore[beatNumber] != 0){
-                //距離によってタイミングを変更
-                var _x = tone.x - seq.x;
-                var _y = tone.y - seq.y;
-                var dist = Math.sqrt(_x * _x + _y * _y);
-                _time = time + dist/1000;
-                if(toneQueue.time != _time){
-                    console.log(_time)
-                    toneQueue.push( { note: beatNumber, time: _time } );
-                    //var synth = new Synth(ctx, toneRecipe);
-                    tone.synth.noteOn(toneScore[beatNumber], _time);
-                    tone.synth.noteOff(_time + noteLength);
-                }
+        var seq = currentSeq;
+        var score = seq.score;
+        if (score[beatNumber] != 0 && toneScore[beatNumber] != 0){
+            //距離によってタイミングを変更
+            var _x = tone.x - seq.x;
+            var _y = tone.y - seq.y;
+            var dist = Math.sqrt(_x * _x + _y * _y);
+            _time = time + dist/1000;
+            if(toneQueue.time != _time){
+                toneQueue.push( { note: beatNumber, time: _time } );
+                //var synth = new Synth(ctx, toneRecipe);
+                tone.synth.noteOn(toneScore[beatNumber], _time);
+                tone.synth.noteOff(_time + noteLength);
+                console.log(currentSeq)
             }
         }
     }

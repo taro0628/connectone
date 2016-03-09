@@ -87,15 +87,20 @@ Tone.prototype.pressmove = function(event){
     tone.isMoved = true;
 };
 Tone.prototype.pressup = function(event){
+    console.log('tonepress')
     var tone = this;
     if(!tone.isMoved){
-        var _x;
-        var _y;
-        var r = 90;
-        var random = 2*Math.PI * Math.random();
-        _x = r * Math.cos(random) + event.stageX;
-        _y = r * Math.sin(random) + event.stageY;
-        placeSequncer(_x, _y, tone);
+        if(event.nativeEvent.button == 2){
+            deleteTone(tone);
+        }else{
+            var _x;
+            var _y;
+            var r = 90;
+            var random = 2*Math.PI * Math.random();
+            _x = r * Math.cos(random) + event.stageX;
+            _y = r * Math.sin(random) + event.stageY;
+            placeSequncer(_x, _y, tone);
+        }
     }
     tone.isMoved = false;
 };
@@ -109,11 +114,24 @@ function placeTone(sequencer, text, x, y, r){
       _x = r * Math.cos(random) + x;
       _y = r * Math.sin(random) + y;
       var tone = new Tone(_x, _y, '#96bbb3', text);
-      sequencer.toneList.push(tone);
+      sequencer.connectedTone.push(tone);
       tone.display();
       tone.connectedSeq.push(sequencer);
       lineList.push(new Line(sequencer, tone, '#fff'));
 
+}
+function deleteTone(tone){
+    for (var i = 0; i < tone.connectedSeq.length; i++) {
+        //つながっているシーケンサーから自分を消す
+        var count = $.inArray(tone, tone.connectedSeq[i].connectedTone);
+        tone.connectedSeq[i].connectedTone.splice(count, 1);
+        //つながっているシーケンサーにトーンがなくなればシーケンサーも消す
+        if(tone.connectedSeq[i].connectedTone.length == 0){
+            deleteSequencer(tone.connectedSeq[i]);
+        }
+    }
+    deleteLine(tone);
+    tone.remove();
 }
 
 function makeRecipe(text){
@@ -157,10 +175,10 @@ function makePitch(text){
 function makeScore(text){
     var len = Math.floor(Math.random() * 12);
 
-    score1 = [7,0,0,0];
-    score2 = [11,0,9,0];
-    score3 = [0,5,0,9];
-    score4 = [9,0,8,0];
+    score1 = [12,0,19,0];
+    score2 = [19,0,24,0];
+    score3 = [18,0,21,0];
+    score4 = [14,0,18,0];
 
     if(len < 3){
         return score1.concat(score3).concat(score2).concat(score1);

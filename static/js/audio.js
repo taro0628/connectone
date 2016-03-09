@@ -272,8 +272,8 @@ Synth.prototype.EnvOn = function(vca, param, time) {
     this.noteOnTime = time;
 
     //attackとdecayが0だとノイズが出るので調整
-    attack = attack || 0.0001;
-    decay = decay || 0.0001;
+    attack = attack || 0.001;
+    decay = decay || 0.001;
 
     vca.gain.cancelScheduledValues(time);  // スケジュールを全て解除
     vca.gain.setValueAtTime(0.0, time);  // 今時点を音の出始めとする
