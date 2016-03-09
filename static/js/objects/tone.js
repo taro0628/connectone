@@ -87,7 +87,6 @@ Tone.prototype.pressmove = function(event){
     tone.isMoved = true;
 };
 Tone.prototype.pressup = function(event){
-    console.log('tonepress')
     var tone = this;
     if(!tone.isMoved){
         if(event.nativeEvent.button == 2){
@@ -104,35 +103,6 @@ Tone.prototype.pressup = function(event){
     }
     tone.isMoved = false;
 };
-
-function placeTone(sequencer, text, x, y, r){
-    //トーンを設置する関数
-      var _x;
-      var _y;
-      var random = 2.5*Math.PI * Math.random();
-      sequencer.r = r;
-      _x = r * Math.cos(random) + x;
-      _y = r * Math.sin(random) + y;
-      var tone = new Tone(_x, _y, '#96bbb3', text);
-      sequencer.connectedTone.push(tone);
-      tone.display();
-      tone.connectedSeq.push(sequencer);
-      lineList.push(new Line(sequencer, tone, '#fff'));
-
-}
-function deleteTone(tone){
-    for (var i = 0; i < tone.connectedSeq.length; i++) {
-        //つながっているシーケンサーから自分を消す
-        var count = $.inArray(tone, tone.connectedSeq[i].connectedTone);
-        tone.connectedSeq[i].connectedTone.splice(count, 1);
-        //つながっているシーケンサーにトーンがなくなればシーケンサーも消す
-        if(tone.connectedSeq[i].connectedTone.length == 0){
-            deleteSequencer(tone.connectedSeq[i]);
-        }
-    }
-    deleteLine(tone);
-    tone.remove();
-}
 
 function makeRecipe(text){
     var _text = window.btoa(encodeURI(text));

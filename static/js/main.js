@@ -1,3 +1,14 @@
+var stage;
+var windowWidth = $(window).width();
+var windowHeight = $(window).height();
+var backColor = '#0E0E0E';
+
+var loadingIcon;
+var currentSeq;
+
+var AudioContext = window.AudioContext || window.webkitAudioContext;
+var ctx = new AudioContext();
+
 function init() {
     stage = new createjs.Stage('Canvas');
 
@@ -27,7 +38,6 @@ document.oncontextmenu = function(){
 };
 
 $(window).on('click', function(event){
-    console.log(currentSeq)
     if(currentSeq == undefined){
         placeSequncer(event.pageX, event.pageY);
         currentSeq = sequencerList[0];

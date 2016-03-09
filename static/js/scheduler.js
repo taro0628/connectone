@@ -34,10 +34,7 @@ function scheduleNote( beatNumber, time ) {
     if ( (noteResolution==2) && (beatNumber%4))
         return; // 1拍が4分なら4分の1は音を鳴らさない
 
-    //何かノードがないとcurrenttimeが進まないのでダミーのオシレータを作成
-    if (ctx.currentTime == 0){
-        //var dummy = ctx.createOscillator();
-    }
+    //シーケンサーがなければ音は鳴らさない
     if (currentSeq == undefined){
         return;
     }
@@ -52,22 +49,18 @@ function scheduleNote( beatNumber, time ) {
     for (var j = 0; j < currentSeq.connectedTone.length; j++) {
         var tone = currentSeq.connectedTone[j];
         var toneQueue = tone.notesInQueue;
-        var toneRecipe = tone.recipe;//音色
         var toneScore = tone.score;
-        var seq = currentSeq;
-        var score = seq.score;
+        var score = currentSeq.score;
         if (score[beatNumber] != 0 && toneScore[beatNumber] != 0){
             //距離によってタイミングを変更
-            var _x = tone.x - seq.x;
-            var _y = tone.y - seq.y;
+            var _x = tone.x - currentSeq.x;
+            var _y = tone.y - currentSeq.y;
             var dist = Math.sqrt(_x * _x + _y * _y);
             _time = time + dist/1000;
             if(toneQueue.time != _time){
                 toneQueue.push( { note: beatNumber, time: _time } );
-                //var synth = new Synth(ctx, toneRecipe);
                 tone.synth.noteOn(toneScore[beatNumber], _time);
                 tone.synth.noteOff(_time + noteLength);
-                console.log(currentSeq)
             }
         }
     }

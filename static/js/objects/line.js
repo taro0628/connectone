@@ -67,18 +67,3 @@ Line.prototype.update = function(){
         .call(blurUpdate,[this.lineBlur]);
     }
 };
-
-//指定したオブジェクトに繋がれている線を消す
-var deleteLine = function(obj){
-    for(var j=0; j<lineList.length; j++){
-        if(lineList[j].start == obj || lineList[j].target == obj){
-            lineList[j].remove();
-        }
-    }
-    //配列から削除する
-    for(var j=0; j<lineList.length; j++){
-        if(lineList[j].start == obj || lineList[j].target == obj){
-            lineList.splice(j, 1);
-        }
-    }
-}
