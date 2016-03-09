@@ -19,6 +19,7 @@ function Synth(ctx, recipe){
     this.addNode('VCA', this.setVCA);
     this.addNode('VCF', this.setVCF);
     this.addNode('Noise', this.setNoise);
+    this.addNode('Delay', this.setDelay);
 
     this.initSynth();
     this.setSynth(JSON.parse(JSON.stringify(this.recipe)), this.ctx.destination);
@@ -201,8 +202,6 @@ Synth.prototype.setVCF = function(synth, currentNode, destNode, node) {
 
 Synth.prototype.setNoise = function(synth, currentNode, destNode, node) {
     var bufsize = 1024;
-    var short_flag = 0;
-    var reg = 0x8000;
     var noise = synth.createNode(currentNode, node, synth.ctx.createScriptProcessor(bufsize));
     noise.onaudioprocess = function(ev){
         var buf0 = ev.outputBuffer.getChannelData(0);
@@ -213,6 +212,50 @@ Synth.prototype.setNoise = function(synth, currentNode, destNode, node) {
 
     //Noiseノードの設定が終わったのでdestNodeに接続
     noise.connect(destNode);
+    currentNode['state'] = true;
+};
+
+Synth.prototype.setDelay = function(synth, currentNode, destNode, node) {
+    var delay = synth.createNode(currentNode, node, synth.ctx.createDelay());
+    var input = currentNode['input'];
+    var param = currentNode['param'];
+
+    var feedback = synth.ctx.createGain();
+    var wetlevel = synth.ctx.createGain();
+    var drylevel = synth.ctx.createGain();
+
+    //Delayに接続されるノードの設定が終わっていなければ設定する
+    if (input['state'] == undefined){
+        synth.setSynth(input, delay);
+    }
+
+    if(param['delayTime'] != undefined){
+        if(param['delayTime']['name'] != undefined){
+            var paramNode = param['delayTime'];
+            synth.setSynth(paramNode, delay.delayTime);
+        //それ以外は数値とみなして代入
+        }else{
+            delay.delayTime.value = param['delayTime'];
+        }
+    }
+
+    if(param['feedback'] != undefined){
+        feedback.gain.value = param['feedback'];
+    }
+
+    if(param['mix'] != undefined){
+        wetlevel.gain.value = param['mix'];
+        drylevel.gain.value = 1 - param['mix'];
+    }
+
+    //Delayノードの設定が終わったのでdestNodeに接続
+    delay.connect(wetlevel);
+    delay.connect(feedback);
+    feedback.connect(delay);
+    var inputNode = synth.nodeManager[input['name']];
+    inputNode.nodeList[inputNode.currentId-1].connect(drylevel);
+    wetlevel.connect(destNode);
+    drylevel.connect(destNode);
     currentNode['state'] = true;
 };
 
