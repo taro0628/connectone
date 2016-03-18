@@ -9,7 +9,7 @@ ModuleManager.prototype.Module = function(setModule){
     this.type = null;
 
     //AudioNodeの設定を行う関数
-    //引数は(Synthオブジェクト, 今見ているレシピノード, AudioNodeの接続先, モジュール)
+    //引数は(Synthオブジェクト, 今見ているレシピノード, AudioNodeの接続先)
     this.setModule = setModule;
 };
 ModuleManager.prototype.registerModule = function(name, setModule, type){
