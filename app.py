@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from bottle import route, run, template, request, static_file, url, get, post, response, error, HTTPResponse
+from bottle import route, run, template, request, static_file, url, get, post, response, error, HTTPResponse, default_app
 import json
 from twitter import *
 import time
@@ -9,6 +9,10 @@ from io     import BytesIO
 from PIL    import Image
 import requests
 import random
+from rauth import OAuth1Service
+from beaker.middleware import SessionMiddleware
+from urllib.parse import parse_qsl
+from requests_oauthlib import OAuth1Session
 
 with open("secret.json") as f:
     secretjson = json.load(f)
@@ -18,9 +22,80 @@ t = 0
 twitter_stream = ''
 twitter_stream_user = ''
 
+session_opts = {
+    'session.type': 'file',
+    'session.data_dir': './data',
+    'session.cookie_expires': True,
+    'session.auto': True
+}
+
 @route('/')
 def root():
     return template('index')
+
+@route('/oauth/request')
+def oauth_request():
+    request_token_url = 'https://api.twitter.com/oauth/request_token'
+
+    client_key = secretjson['consumer_key']
+    client_secret = secretjson['consumer_secret']
+
+    oauth = OAuth1Session(client_key, client_secret=client_secret)
+    fetch_response = oauth.fetch_request_token(request_token_url)
+
+    #リクエストトークンを取得
+    request_token = fetch_response.get('oauth_token')
+    request_token_secret = fetch_response.get('oauth_token_secret')
+
+    #リクエストトークンシークレットをセッションに保存
+    session = request.environ.get('beaker.session')
+    session['request_token'] = request_token
+    session['request_token_secret'] = request_token_secret
+    session.save()
+
+    #認証用のURLを返す
+    base_authorization_url = 'https://api.twitter.com/oauth/authorize'
+    authorization_url = oauth.authorization_url(base_authorization_url)
+
+    return authorization_url
+
+@route('/oauth/access')
+def oauth_access():
+    access_token_url = 'https://api.twitter.com/oauth/access_token'
+    client_key = secretjson['consumer_key']
+    client_secret = secretjson['consumer_secret']
+
+    oauth_token = request.query.oauth_token
+    oauth_verifier = request.query.oauth_verifier
+
+    session = request.environ.get('beaker.session')
+    request_token = session.get('request_token', '')
+    request_token_secret = session.get('request_token_secret', '')
+
+    oauth = OAuth1Session(client_key,
+                          client_secret=client_secret,
+                          resource_owner_key=oauth_token,
+                          resource_owner_secret=request_token_secret,
+                          verifier=oauth_verifier)
+
+    oauth_tokens = oauth.fetch_access_token(access_token_url)
+
+    #アクセストークンを取得
+    access_token = oauth_tokens.get('oauth_token')
+    access_token_secret = oauth_tokens.get('oauth_token_secret')
+    user_id = oauth_tokens.get('user_id')
+    screen_name = oauth_tokens.get('screen_name')
+
+    #セッションに保存
+    session['access_token'] = access_token
+    session['access_token_secret'] = access_token_secret
+    session['screen_name'] = screen_name
+    session.save()
+
+    r = HTTPResponse(status=302)
+    r.set_header('Location', 'http://127.0.0.1:8001/')
+
+    return r
 
 #静的ファイルの設定
 #本番ではhttpサーバが担当
@@ -33,7 +108,15 @@ def static(filepath):
 @route('/user/icon/<screen_name>')
 def getIcon(screen_name):
     #ツイッターAPIの準備
-    auth = OAuth(secretjson["access_token"], secretjson["access_token_secret"], secretjson["consumer_key"], secretjson["consumer_secret"])
+    session = request.environ.get('beaker.session')
+    access_token = session.get('access_token', '')
+    access_token_secret = session.get('access_token_secret', '')
+
+    #screen_nameがdefaultだったらログインしたユーザーのスクリーンネームを設定
+    if screen_name == 'default':
+        screen_name = session.get('screen_name')
+
+    auth = OAuth(access_token, access_token_secret, secretjson["consumer_key"], secretjson["consumer_secret"])
     t = Twitter(auth = auth)
 
     #スクリーンネームでユーザを検索し、アイコンのurlを取得
@@ -56,7 +139,10 @@ def getIcon(screen_name):
 @route('/user/name/<text>')
 def getName(text):
     #ツイッターAPIの準備
-    auth = OAuth(secretjson["access_token"], secretjson["access_token_secret"], secretjson["consumer_key"], secretjson["consumer_secret"])
+    session = request.environ.get('beaker.session')
+    access_token = session.get('access_token', '')
+    access_token_secret = session.get('access_token_secret', '')
+    auth = OAuth(access_token, access_token_secret, secretjson["consumer_key"], secretjson["consumer_secret"])
     t = Twitter(auth = auth)
 
     result = t.search.tweets(q = text, lang = 'ja', count = 100)
@@ -88,7 +174,10 @@ def getTweet(screen_name):
     mecab = MeCab.Tagger ('-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd')
 
     #ツイッターAPIの準備
-    auth = OAuth(secretjson["access_token"], secretjson["access_token_secret"], secretjson["consumer_key"], secretjson["consumer_secret"])
+    session = request.environ.get('beaker.session')
+    access_token = session.get('access_token', '')
+    access_token_secret = session.get('access_token_secret', '')
+    auth = OAuth(access_token, access_token_secret, secretjson["consumer_key"], secretjson["consumer_secret"])
     t = Twitter(auth = auth)
 
     #ツイートを取得
@@ -115,5 +204,6 @@ def getTweet(screen_name):
     #結果はJSON形式で返す
     return json.dumps(resultList, ensure_ascii=False)
 
-
-run(host="localhost", port=8001, debug=True, reloader=True)
+app = default_app()
+app = SessionMiddleware(app, session_opts)
+run(app=app, host="localhost", port=8001, debug=True, reloader=True)

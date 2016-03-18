@@ -7,7 +7,7 @@ var loadingIcon;
 var currentSeq;
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
-var ctx = new AudioContext();
+var ctx;
 
 function init() {
     stage = new createjs.Stage('Canvas');
@@ -20,29 +20,61 @@ function init() {
 
     //ローディングアイコンを読み込み
     var data = {};
-    data.images = ['static/img/loading.png'];
+    data.images = ['/static/img/loading.png'];
     data.frames = {width:100, height:100, regX:50, regY:50};
     data.animations = {load: [0, 16]};
     var loadingIconSheet = new createjs.SpriteSheet(data);
     loadingIcon = new createjs.Sprite(loadingIconSheet);
 
     createjs.EventDispatcher.initialize(Sequencer.prototype);
-    createjs.Ticker.addEventListener('tick', tick);
 
-    placeSequncer(windowWidth/2, windowHeight/2);
-    currentSeq = sequencerList[0];
-
+    //クッキーを取得
+    cookie = document.cookie;
+    cookie = cookie.split('=');
+    //セッションがあればトップ画面は表示しない
+    if(cookie[0] == 'beaker.session.id'){
+        ctx = new AudioContext();
+        placeSequncer(windowWidth/2, windowHeight/2);
+        currentSeq = sequencerList[0];
+        $(window).on('click', function(event){
+            if(currentSeq == undefined){
+                placeSequncer(event.pageX, event.pageY);
+                currentSeq = sequencerList[0];
+            }
+        });
+        var timerId = setInterval(function(){
+            scheduler();
+        }, lookahead)
+        createjs.Ticker.addEventListener('tick', tick);
+    //セッションがなければtwitterでログインしてもらうためトップ画面を表示
+    }else{
+        $('#top').fadeIn();
+        $('#top .btn').on('click', function(){
+            //ボタンをクリックするとtwitterの認証画面に飛ぶ
+            getRequestURL()
+            .done(function(response){
+                location.href = response;
+            })
+            .fail(function() {
+                console.log('Error');
+            });
+        });
+    }
 }
+
+//twitteの認証画面に飛ばす
+var getRequestURL = function(){
+    return $.ajax({
+        type: 'GET',
+        url: 'http://127.0.0.1:8001/oauth/request',
+        dataType: 'text'
+    });
+};
+
+//右クリックを禁止
 document.oncontextmenu = function(){
     return false;
 };
-
-$(window).on('click', function(event){
-    if(currentSeq == undefined){
-        placeSequncer(event.pageX, event.pageY);
-        currentSeq = sequencerList[0];
-    }
-});
 
 function tick() {
     var currentTime = ctx.currentTime;

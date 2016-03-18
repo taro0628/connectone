@@ -7,8 +7,11 @@
     <link href="/static/css/index.css" rel="stylesheet" type="text/css">
 </head>
 <body onload="init();">
+    <section id="top">
+        <h1>ConnecTone</h1>
+        <div class="btn">LOGIN with TWITTER</div>
+    </section>
     <canvas id="Canvas"></canvas>
-    <div id="hoge"></div>
 
     <script src="/static/js/jquery-2.2.0.min.js" charset="utf-8"></script>
     <script src="https://code.createjs.com/easeljs-0.8.2.min.js"></script>

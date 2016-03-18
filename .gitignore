@@ -2,3 +2,11 @@
 node_modules
 secret.json
 recipe.js
+mysql-connector-python-2.0.4.zip
+data
+mysql-connector-python-2.0.4
+index_login.tpl
+index_login.css
+test_sql.py
+query_parse.py
+auth.js

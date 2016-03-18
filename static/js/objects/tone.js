@@ -8,8 +8,6 @@ function Tone(x, y, c, text){
     this.pitch = makePitch(text);
     this.score = makeScore(text);
     this.container = new createjs.Container();
-    this.container.on('pressmove', this.pressmove, this);
-    this.container.on('pressup', this.pressup, this);
     this.isMoved = false;
     this.synth = new Synth(ctx, this.recipe);
 
@@ -18,6 +16,8 @@ function Tone(x, y, c, text){
     this.text = text;
     this.string = new createjs.Text(text, "20px Arial", c);
     this.circleBase = new createjs.Shape();
+    this.circleBase.on('pressmove', this.pressmove, this);
+    this.circleBase.on('pressup', this.pressup, this);
 
     this.string.textAlign = "center"; // 水平中央に
     this.string.textBaseline = "middle"; // 垂直中央に
