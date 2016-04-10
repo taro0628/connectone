@@ -14,14 +14,14 @@ function Line(start, target, c){
     this.line.graphics.append(createjs.Graphics.beginCmd);
     this.line.graphics.append(this.startLine);
     this.line.graphics.append(this.targetLine);
-    this.line.graphics.append(new createjs.Graphics.Stroke(c));
     this.line.graphics.append(new createjs.Graphics.StrokeStyle(1));
+    this.line.graphics.append(new createjs.Graphics.Stroke(c));
 
     this.lineBlur.graphics.append(createjs.Graphics.beginCmd);
     this.lineBlur.graphics.append(this.startLine);
     this.lineBlur.graphics.append(this.targetLine);
-    this.lineBlur.graphics.append(new createjs.Graphics.Stroke(c));
     this.lineBlur.graphics.append(new createjs.Graphics.StrokeStyle(1));
+    this.lineBlur.graphics.append(new createjs.Graphics.Stroke(c));
 
     var blurFilter = new createjs.BlurFilter(0, 0, 2);
     blurFilter.blurX = blurFilter.blurY = 10;

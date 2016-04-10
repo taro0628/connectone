@@ -31,20 +31,25 @@ function init() {
     //クッキーを取得
     cookie = document.cookie;
     cookie = cookie.split('=');
+    
     //セッションがあればトップ画面は表示しない
     if(cookie[0] == 'beaker.session.id'){
         ctx = new AudioContext();
+        //シーケンサーを設置
         placeSequncer(windowWidth/2, windowHeight/2);
         currentSeq = sequencerList[0];
+
         $(window).on('click', function(event){
             if(currentSeq == undefined){
                 placeSequncer(event.pageX, event.pageY);
                 currentSeq = sequencerList[0];
             }
         });
+        //スケジューラを動かす
         var timerId = setInterval(function(){
             scheduler();
         }, lookahead)
+
         createjs.Ticker.addEventListener('tick', tick);
     //セッションがなければtwitterでログインしてもらうためトップ画面を表示
     }else{
