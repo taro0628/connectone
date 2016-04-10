@@ -31,7 +31,7 @@ function init() {
     //クッキーを取得
     cookie = document.cookie;
     cookie = cookie.split('=');
-    
+
     //セッションがあればトップ画面は表示しない
     if(cookie[0] == 'beaker.session.id'){
         ctx = new AudioContext();
@@ -71,7 +71,7 @@ function init() {
 var getRequestURL = function(){
     return $.ajax({
         type: 'GET',
-        url: 'http://127.0.0.1:8001/oauth/request',
+        url: 'http://k-taro.xyz/oauth/request',
         dataType: 'text'
     });
 };

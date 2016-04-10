@@ -73,7 +73,3 @@ function scheduler() {
         nextNote();
     }
 }
-
-var timerId = setInterval(function(){
-    scheduler();
-}, lookahead)
