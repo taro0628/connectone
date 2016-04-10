@@ -93,7 +93,7 @@ def oauth_access():
     session.save()
 
     r = HTTPResponse(status=302)
-    r.set_header('Location', 'http://127.0.0.1:8001/')
+    r.set_header('Location', 'http://k-taro.xyz/')
 
     return r
 
