@@ -208,3 +208,4 @@ def getTweet(screen_name):
 
 #run(host="localhost", port=8001, debug=True, reloader=True)
 application = default_app()
+application = SessionMiddleware(application, session_opts)
