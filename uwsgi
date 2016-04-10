@@ -1,0 +1,29 @@
+#!/bin/sh
+
+main_dir="/var/www/html/taro"
+wsgi_ini="${main_dir}/uwsgi.ini"
+wsgi_pid="/var/run/uwsgi/k-taro.xyz.pid"
+wsgi_log="/var/log/uwsgi/k-taro.xyz.log"
+
+start(){
+    echo "uWSGI start"
+    uwsgi --ini $wsgi_ini
+}
+
+stop(){
+    echo "uWSGI stop"
+    kill -QUIT `cat $wsgi_pid`
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+esac

@@ -58,7 +58,7 @@ var placeSequncer = function(x, y, tone) {
 var getTweet = function(screenName){
     return $.ajax({
         type: 'GET',
-        url: 'http://127.0.0.1:8001/tweet/words/' + encodeURI(screenName),
+        url: 'http://k-taro.xyz/tweet/words/' + encodeURI(screenName),
         dataType: 'json'
     });
 };
@@ -67,7 +67,7 @@ var getTweet = function(screenName){
 var getScreenName = function(text){
     return $.ajax({
         type: 'GET',
-        url: 'http://127.0.0.1:8001/user/name/' + encodeURI(text),
+        url: 'http://k-taro.xyz/user/name/' + encodeURI(text),
         dataType: 'text'
     });
 };
@@ -77,7 +77,7 @@ var getIcon = function (screenName) {
     var dfd = $.Deferred();
     var xhr = new XMLHttpRequest();
 
-    xhr.open('GET', 'http://127.0.0.1:8001/user/icon/' + encodeURI(screenName), true);
+    xhr.open('GET', 'http://k-taro.xyz/user/icon/' + encodeURI(screenName), true);
     xhr.responseType = 'arraybuffer';
     xhr.addEventListener('load',function(ev){
         var bytes = new Uint8Array(this.response);

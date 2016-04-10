@@ -171,7 +171,8 @@ def filter(text):
 #スクリーンネームで指定したユーザの頻出単語を取得
 @route('/tweet/words/<screen_name>')
 def getTweet(screen_name):
-    mecab = MeCab.Tagger ('-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd')
+    mecab = MeCab.Tagger ('-d /usr/lib64/mecab/dic/mecab-ipadic-neologd')
+    #mecab = MeCab.Tagger ()
 
     #ツイッターAPIの準備
     session = request.environ.get('beaker.session')
@@ -189,10 +190,10 @@ def getTweet(screen_name):
         mecab.parse('')
         node = mecab.parseToNode(text)
         while node:
-            print('{0}, {1}'.format(node.surface, node.feature))
+            #print('{0}, {1}'.format(node.surface, node.feature))
             word = node.surface
             pos = node.feature.split(",")[1]
-            print(pos)
+            #print(pos)
             if pos == "固有名詞" and len(word) != 1:
                 word2freq[word] += 1
             node = node.next
@@ -204,6 +205,6 @@ def getTweet(screen_name):
     #結果はJSON形式で返す
     return json.dumps(resultList, ensure_ascii=False)
 
-app = default_app()
-app = SessionMiddleware(app, session_opts)
-run(app=app, host="localhost", port=8001, debug=True, reloader=True)
+
+#run(host="localhost", port=8001, debug=True, reloader=True)
+application = default_app()
