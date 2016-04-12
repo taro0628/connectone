@@ -171,8 +171,13 @@ def filter(text):
 #スクリーンネームで指定したユーザの頻出単語を取得
 @route('/tweet/words/<screen_name>')
 def getTweet(screen_name):
+
+    #screen_nameがdefaultだったらログインしたユーザーのスクリーンネームを設定
+    if screen_name == 'default':
+        session = request.environ.get('beaker.session')
+        screen_name = session.get('screen_name')
+
     mecab = MeCab.Tagger ('-d /usr/lib64/mecab/dic/mecab-ipadic-neologd')
-    #mecab = MeCab.Tagger ()
 
     #ツイッターAPIの準備
     session = request.environ.get('beaker.session')
