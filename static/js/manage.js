@@ -7,6 +7,7 @@ var sequencerList = [];
 var placeSequncer = function(x, y, tone) {
 
     //ローディングアイコンを表示
+    var loadingIcon = new createjs.Sprite(loadingIconSheet);
     loadingIcon.x = x;
     loadingIcon.y = y;
     loadingIcon.scaleX = 0;

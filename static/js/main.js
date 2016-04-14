@@ -3,7 +3,7 @@ var windowWidth = $(window).width();
 var windowHeight = $(window).height();
 var backColor = '#0E0E0E';
 
-var loadingIcon;
+var loadingIconSheet;
 var currentSeq;
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -23,15 +23,14 @@ function init() {
     data.images = ['/static/img/loading.png'];
     data.frames = {width:100, height:100, regX:50, regY:50};
     data.animations = {load: [0, 16]};
-    var loadingIconSheet = new createjs.SpriteSheet(data);
-    loadingIcon = new createjs.Sprite(loadingIconSheet);
+    loadingIconSheet = new createjs.SpriteSheet(data);
 
     createjs.EventDispatcher.initialize(Sequencer.prototype);
 
     //クッキーを取得
     cookie = document.cookie;
     cookie = cookie.split('=');
-    
+
     //セッションがあればトップ画面は表示しない
     if(cookie[0] == 'beaker.session.id'){
         ctx = new AudioContext();
