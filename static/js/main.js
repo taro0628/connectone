@@ -52,7 +52,7 @@ function init() {
         createjs.Ticker.addEventListener('tick', tick);
     //セッションがなければtwitterでログインしてもらうためトップ画面を表示
     }else{
-        $('#top').fadeIn();
+        $('#top').fadeIn(1000);
         $('#top .btn').on('click', function(){
             //ボタンをクリックするとtwitterの認証画面に飛ぶ
             getRequestURL()
