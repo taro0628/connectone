@@ -4,6 +4,8 @@ var windowHeight = $(window).height();
 var backColor = '#0E0E0E';
 
 var loadingIconSheet;
+var isLoading = false;
+var isExistSeq = false;
 var currentSeq;
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -34,12 +36,13 @@ function init() {
     //セッションがあればトップ画面は表示しない
     if(cookie[0] == 'beaker.session.id'){
         ctx = new AudioContext();
-        //シーケンサーを設置
+        //最初のシーケンサーを設置
         placeSequncer(windowWidth/2, windowHeight/2);
         currentSeq = sequencerList[0];
 
+        //クリックした場所にシーケンサーを置くように設定
         $(window).on('click', function(event){
-            if(currentSeq == undefined){
+            if(isExistSeq == false && currentSeq == undefined && isLoading == false){
                 placeSequncer(event.pageX, event.pageY);
                 currentSeq = sequencerList[0];
             }

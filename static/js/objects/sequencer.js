@@ -48,6 +48,7 @@ Sequencer.prototype.pressup = function(event){
     var seq = this;
     //移動モードを解除
     if(!seq.isMoved){
+        //右クリックの時はシーケンサーを消去する
         if(event.nativeEvent.button == 2){
             deleteSequencer(seq);
         }else{

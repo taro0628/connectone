@@ -16,6 +16,7 @@ var placeSequncer = function(x, y, tone) {
     stage.addChild(loadingIcon);
     createjs.Tween.get(loadingIcon)
         .to({scaleX: 0.7, scaleY: 0.7}, 100);
+    isLoading = true;
 
     //トーンが指定されていなければダミーのテキストを設定
     var text;
@@ -48,6 +49,8 @@ var placeSequncer = function(x, y, tone) {
             .to({scaleX: 0, scaleY: 0}, 100)
             .call(function(x, y, tone, words, iconSrc){
                 createSequncer(x, y, tone, words, iconSrc);
+                isLoading = false;
+                if(!isExistSeq){isExistSeq=true}
             },[x, y, tone, words, iconSrc]);
     })
     .fail(function() {
@@ -151,6 +154,7 @@ var deleteSequencer = function(seq){
     sequencerList.splice(count, 1);
     if(sequencerList.length == 0){
         currentSeq = undefined;
+        isExistSeq = false;
     }
     seq.remove();
 }
