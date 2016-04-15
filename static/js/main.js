@@ -16,9 +16,20 @@ function init() {
 
     $('Canvas').attr({width : windowWidth});
     $('Canvas').attr({height : windowHeight});
+
     var background = new createjs.Shape();
-    background.graphics.beginFill('#0E0E0E').drawRect(0,0,windowWidth,windowHeight);
+    background.graphics.beginFill(backColor).drawRect(0,0,windowWidth,windowHeight);
     stage.addChild(background);
+
+    //画面幅に合わせてキャンバスを更新
+    var id;
+    $(window).on('resize', function(e){
+        clearTimeout(id);
+        id = setTimeout(function(){
+            stage.canvas.width = $(e.target).width();
+            stage.canvas.height = $(e.target).height();
+        }, 100);
+    });
 
     //ローディングアイコンを読み込み
     var data = {};
