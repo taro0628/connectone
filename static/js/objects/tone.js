@@ -35,38 +35,38 @@ function Tone(x, y, c, text){
     this.container.addChild(this.string);
 
     stage.addChild(this.container);
+
+    //ノートオン時のエフェクトを設定
+    this.effect = new createjs.Shape();
+    this.effect.graphics
+        .beginStroke(this.color)
+        .setStrokeStyle(1)
+        .drawCircle(0,0,100);
+    this.effect.scaleX = this.effect.scaleY = 0;
+    this.effectBlur = new createjs.Shape();
+    this.effectBlur.graphics
+        .beginStroke(this.color)
+        .setStrokeStyle(1)
+        .drawCircle(0,0,100);
+    this.effectBlur.scaleX = this.effectBlur.scaleY = 0;
+    var blurFilter = new createjs.BlurFilter(0, 0, 2);
+    blurFilter.blurX = blurFilter.blurY = 10;
+    this.effectBlur.filters = [blurFilter];
+    this.effectBlur.cache(-100, -100, 200, 200);
+    this.container.addChild(this.effect);
+    this.container.addChild(this.effectBlur);
+
 }
 Tone.prototype.display = function(){
     createjs.Tween.get(this.container).to({scaleX:1, scaleY:1}, 300);
 };
 Tone.prototype.noteOn = function(){
-    var effect = new createjs.Shape();
-    effect.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawCircle(0,0,100);
-    effect.scaleX = effect.scaleY = 0;
-    createjs.Tween.get(effect)
+    createjs.Tween.get(this.effect)
         .to({scaleX:1, scaleY:1}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-
-    var effectBlur = new createjs.Shape();
-    effectBlur.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawCircle(0,0,100);
-    effectBlur.scaleX = effectBlur.scaleY = 0;
-    createjs.Tween.get(effectBlur)
+        .to({scaleX:0, scaleY:0}, 300);
+    createjs.Tween.get(this.effectBlur)
         .to({scaleX:1, scaleY:1}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-    var blurFilter = new createjs.BlurFilter(0, 0, 2);
-        blurFilter.blurX = blurFilter.blurY = 10;
-        effectBlur.filters = [blurFilter];
-        effectBlur.cache(-100, -100, 200, 200);
-    this.container.addChild(effect);
-    this.container.addChild(effectBlur);
+        .to({scaleX:0, scaleY:0}, 300);
 };
 Tone.prototype.remove =  function(){
     createjs.Tween.get(this.container,{override:true})
@@ -90,8 +90,10 @@ Tone.prototype.pressup = function(event){
     var tone = this;
     if(!tone.isMoved){
         if(event.nativeEvent.button == 2){
+            //右クリックの時はトーンを消去する
             deleteTone(tone);
         }else{
+            //クリックの時はシーケンサーを設置する
             var _x;
             var _y;
             var r = 90;

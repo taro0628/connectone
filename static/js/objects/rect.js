@@ -32,9 +32,16 @@ function Rect(x, y, c, isBlur){
     this.container.y = y;
     this.container.scaleX = this.container.scaleY = 0;
 
+    //ノートオン時のエフェクトを設定
+    this.effect = new createjs.Shape();
+    this.effect.graphics
+        .beginStroke(this.color)
+        .setStrokeStyle(1)
+        .drawRect(-100, -100, 200, 200);
+    this.effect.scaleX = this.effect.scaleY = 0;
 
     if(isBlur){
-    var blurFilter = new createjs.BlurFilter(0, 0, 2);
+        var blurFilter = new createjs.BlurFilter(0, 0, 2);
         blurFilter.blurX = blurFilter.blurY = 10;
         this.rect1.filters = [blurFilter];
         this.rect1.cache(-50, -50, 100, 100);
@@ -42,12 +49,18 @@ function Rect(x, y, c, isBlur){
         this.rect2.cache(-50, -50, 100, 100);
         this.rect3.filters = [blurFilter];
         this.rect3.cache(-50, -50, 100, 100);
+
+        this.effect.filters = [blurFilter];
+        this.effect.cache(-100, -100, 200, 200);
     }
 
     this.container.hitArea = this.rectBase;
     this.container.addChild(this.rect1);
     this.container.addChild(this.rect2);
     this.container.addChild(this.rect3);
+
+    this.container.addChild(this.effect);
+
     stage.addChild(this.container);
 }
 Rect.prototype.display = function(){
@@ -57,34 +70,9 @@ Rect.prototype.display = function(){
     createjs.Tween.get(this.rect3, {loop:true}).to({rotation:360}, 1000);
 };
 Rect.prototype.noteOn = function(){
-    var effect = new createjs.Shape();
-    effect.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawRect(-100, -100, 200, 200);
-    effect.scaleX = effect.scaleY = 0;
-    createjs.Tween.get(effect)
+    createjs.Tween.get(this.effect)
         .to({scaleX:1, scaleY:1, rotation:360}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-
-    var effectBlur = new createjs.Shape();
-    effectBlur.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawRect(-100, -100, 200, 200);
-    effectBlur.scaleX = effectBlur.scaleY = 0;
-    createjs.Tween.get(effectBlur)
-        .to({scaleX:1, scaleY:1, rotation:360}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-
-    var blurFilter = new createjs.BlurFilter(0, 0, 2);
-        blurFilter.blurX = blurFilter.blurY = 10;
-        effectBlur.filters = [blurFilter];
-        effectBlur.cache(-100, -100, 200, 200);
-    this.container.addChild(effect);
-    this.container.addChild(effectBlur);
+        .to({scaleX:0, scaleY:0}, 300);
 };
 Rect.prototype.remove =  function(){
     createjs.Tween.get(this.container,{override:true})

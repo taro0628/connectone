@@ -28,6 +28,7 @@ Sequencer.prototype.display = function(){
 }
 Sequencer.prototype.noteOn = function(){
     this.component.noteOn();
+    this.componentBlur.noteOn();
 }
 Sequencer.prototype.remove = function(){
     this.component.remove();

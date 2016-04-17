@@ -47,6 +47,14 @@ function Circle(x, y, c, isBlur){
     this.container.y = y;
     this.container.scaleX = this.container.scaleY = 0;
 
+    //ノートオン時のエフェクトを設定
+    this.effect = new createjs.Shape();
+    this.effect.graphics
+        .beginStroke(this.color)
+        .setStrokeStyle(1)
+        .drawCircle(0,0,100);
+    this.effect.scaleX = this.effect.scaleY = 0;
+
     if(isBlur){
     var blurFilter = new createjs.BlurFilter(0, 0, 2);
         blurFilter.blurX = blurFilter.blurY = 10;
@@ -62,6 +70,9 @@ function Circle(x, y, c, isBlur){
         this.circle5.cache(-100, -100, 200, 200);
         this.circle6.filters = [blurFilter];
         this.circle6.cache(-100, -100, 200, 200);
+
+        this.effect.filters = [blurFilter];
+        this.effect.cache(-100, -100, 200, 200);
     }
 
     this.container.hitArea = this.circleBase;
@@ -71,6 +82,9 @@ function Circle(x, y, c, isBlur){
     this.container.addChild(this.circle4);
     this.container.addChild(this.circle5);
     this.container.addChild(this.circle6);
+
+    this.container.addChild(this.effect);
+
     stage.addChild(this.container);
 }
 Circle.prototype.display = function(){
@@ -83,33 +97,9 @@ Circle.prototype.display = function(){
     createjs.Tween.get(this.circle6, {loop:true}).to({rotation:360}, 1000);
 };
 Circle.prototype.noteOn = function(){
-    var effect = new createjs.Shape();
-    effect.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawCircle(0,0,100);
-    effect.scaleX = effect.scaleY = 0;
-    createjs.Tween.get(effect)
-        .to({scaleX:1, scaleY:1}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-
-    var effectBlur = new createjs.Shape();
-    effectBlur.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawCircle(0,0,100);
-    effectBlur.scaleX = effectBlur.scaleY = 0;
-    createjs.Tween.get(effectBlur)
-        .to({scaleX:1, scaleY:1}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-    var blurFilter = new createjs.BlurFilter(0, 0, 2);
-        blurFilter.blurX = blurFilter.blurY = 10;
-        effectBlur.filters = [blurFilter];
-        effectBlur.cache(-100, -100, 200, 200);
-    this.container.addChild(effect);
-    this.container.addChild(effectBlur);
+    createjs.Tween.get(this.effect)
+        .to({scaleX:1, scaleY:1, rotation:360}, 300)
+        .to({scaleX:0, scaleY:0}, 300);
 };
 Circle.prototype.remove =  function(){
     createjs.Tween.get(this.container,{override:true})
