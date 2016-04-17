@@ -48,7 +48,21 @@ var placeSequncer = function(x, y, tone) {
         createjs.Tween.get(loadingIcon)
             .to({scaleX: 0, scaleY: 0}, 100)
             .call(function(x, y, tone, words, iconSrc){
-                createSequncer(x, y, tone, words, iconSrc);
+
+                var seq = new Sequencer(x, y, words, iconSrc);
+                sequencerList.push(seq);
+                seq.display();
+
+                //トーンが指定されていれば線でつなぐ
+                tone = tone || undefined;
+                if(tone != undefined){
+                    //トーンを登録
+                    seq.connectedTone.push(tone)
+
+                    tone.connectedSeq.push(seq);
+                    lineList.push(new Line(seq, tone, '#fff'));
+                }
+
                 isLoading = false;
                 if(!isExistSeq){isExistSeq=true}
             },[x, y, tone, words, iconSrc]);
@@ -116,27 +130,6 @@ var getIcon = function (screenName) {
     xhr.send();
     return dfd.promise();
 };
-
-var createSequncer =  function(x, y, tone, words, iconSrc){
-//シーケンサーを設置する関数
-//トーンが指定されていれば設置したシーケンサーと繋ぐ
-
-    tone = tone || undefined;
-    var rand = Math.random();
-    var component = rand>0.5 ? Rect : Circle;
-    var seq = new Sequencer(x, y, '#96bbb3', component, words, iconSrc);
-    sequencerList.push(seq);
-    seq.display();
-
-    //トーンが指定されていれば線を引く
-    if(tone != undefined){
-        //トーンを登録
-        seq.connectedTone.push(tone)
-
-        tone.connectedSeq.push(seq);
-        lineList.push(new Line(seq, tone, '#fff'));
-    }
-}
 
 var deleteSequencer = function(seq){
     for (var i = 0; i < seq.connectedTone.length; i++) {

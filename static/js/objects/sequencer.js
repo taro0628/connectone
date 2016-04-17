@@ -1,8 +1,13 @@
-function Sequencer(x, y, c, component, words, iconSrc){
+function Sequencer(x, y, words, iconSrc){
     this.x = x;
     this.y = y;
-    this.color = c;
-    this.component = new component(x, y, c, false);
+
+    this.color = '#96bbb3';
+    var rand = Math.random();
+    var component = rand>0.5 ? Rect : Circle;
+    var component = Circle;
+
+    this.component = new component(x, y, this.color, false);
     this.container = this.component.container;
     this.container.on('pressmove', this.pressmove, this);
     this.container.on('pressup', this.pressup, this);
@@ -13,7 +18,7 @@ function Sequencer(x, y, c, component, words, iconSrc){
     icon.y = -icon.getBounds().height/2;
     this.container.addChild(icon);
 
-    this.componentBlur = new component(x, y, c, true);
+    this.componentBlur = new component(x, y, this.color, true);
 
     this.connectedTone = [];
 
@@ -34,15 +39,15 @@ Sequencer.prototype.remove = function(){
     this.component.remove();
     this.componentBlur.remove();
 };
-Sequencer.prototype.move = function(x, y){
-    this.x = x;
-    this.y = y;
-    this.component.move(x, y);
-    this.componentBlur.move(x, y);
-};
 Sequencer.prototype.pressmove = function(event){
     var seq = this;
-    seq.move(event.stageX, event.stageY);
+
+    this.x = event.stageX;
+    this.y = event.stageY;
+
+    this.component.move(event.stageX, event.stageY);
+    this.componentBlur.move(event.stageX, event.stageY);
+
     seq.isMoved = true;
 };
 Sequencer.prototype.pressup = function(event){
@@ -53,6 +58,7 @@ Sequencer.prototype.pressup = function(event){
         if(event.nativeEvent.button == 2){
             deleteSequencer(seq);
         }else{
+            //クリックの時はトーンを設置する
             text = seq.words[0];
             //一度使った単語はもう使わない
             seq.words.splice(0, 1);
