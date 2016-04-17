@@ -17,6 +17,7 @@ function nextNote() {
 
     current16thNote++;    // 次の拍へ
     if (current16thNote == 16) {
+        //小節の最後の処理
         current16thNote = 0;
         if(sequencerList.length != 0){
             currentSeqNum++;
@@ -48,22 +49,28 @@ function scheduleNote( beatNumber, time ) {
     var _time;
     for (var j = 0; j < currentSeq.connectedTone.length; j++) {
         var tone = currentSeq.connectedTone[j];
-        var toneQueue = tone.notesInQueue;
-        var toneScore = tone.score;
-        var score = currentSeq.score;
-        if (score[beatNumber] != 0 && toneScore[beatNumber] != 0){
-            //距離によってタイミングを変更
-            var _x = tone.x - currentSeq.x;
-            var _y = tone.y - currentSeq.y;
-            var dist = Math.sqrt(_x * _x + _y * _y);
-            _time = time + dist/1000;
-            if(toneQueue.time != _time){
-                toneQueue.push( { note: beatNumber, time: _time } );
-                tone.synth.noteOn(toneScore[beatNumber], _time);
-                tone.synth.noteOff(_time + noteLength);
-            }
+        seqNoteOn(currentSeq, tone, beatNumber, time);
+    }
+}
+
+function seqNoteOn(seq, tone, beatNumber, time) {
+    var toneQueue = tone.notesInQueue;
+    var toneScore = tone.score;
+    var seqScore = seq.score;
+    //シーケンサーのスコアとトーンのスコアの両方に音が設定されていれば鳴らす
+    if (seqScore[beatNumber] != 0 && toneScore[beatNumber] != 0){
+        //距離によってタイミングを変更
+        var _x = tone.x - seq.x;
+        var _y = tone.y - seq.y;
+        var dist = Math.sqrt(_x * _x + _y * _y);
+        _time = time + dist/1000;
+        if(toneQueue.time != _time){
+            toneQueue.push( { note: beatNumber, time: _time } );
+            tone.synth.noteOn(toneScore[beatNumber], _time);
+            tone.synth.noteOff(_time + noteLength);
         }
     }
+
 }
 
 function scheduler() {
