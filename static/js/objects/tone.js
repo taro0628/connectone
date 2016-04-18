@@ -132,12 +132,17 @@ function makeRecipe(text){
 }
 
 function makePitch(text){
-    len = Math.random() * 9;
-    if(len < 3){
+    var _text = window.btoa(encodeURI(text));
+    var num = 0;
+    for (var i = 0; i < _text.length; i++) {
+        num += _text.charCodeAt(i);
+    }
+
+    if(num < 3){
         return 9;
-    }else if(len < 6){
+    }else if(num < 6){
         return 11;
-    }else if(len < 9){
+    }else if(num < 9){
         return 13;
     }else{
         return 15;
@@ -149,8 +154,8 @@ function makeScore(text){
 
     score1 = [12,0,19,0];
     score2 = [19,0,24,0];
-    score3 = [18,0,21,0];
-    score4 = [14,0,18,0];
+    score3 = [18,21,0,0];
+    score4 = [14,0,18,18];
 
     if(len < 3){
         return score1.concat(score3).concat(score2).concat(score1);

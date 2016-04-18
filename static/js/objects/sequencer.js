@@ -1,11 +1,9 @@
-function Sequencer(x, y, words, iconSrc){
+function Sequencer(x, y, statuses_count, favourites_count, words, iconSrc){
     this.x = x;
     this.y = y;
 
-    this.color = '#96bbb3';
-    var rand = Math.random();
-    var component = rand>0.5 ? Rect : Circle;
-    var component = Circle;
+    this.color = this.makeColor(statuses_count);
+    var component = this.makeComponent(favourites_count);
 
     this.component = new component(x, y, this.color, false);
     this.container = this.component.container;
@@ -66,4 +64,24 @@ Sequencer.prototype.pressup = function(event){
         }
     }
     seq.isMoved = false;
+};
+
+Sequencer.prototype.makeColor = function(statuses_count){
+    if(statuses_count>20000){
+        return'#9696aa';
+    }else if(statuses_count>15000){
+        return'#bb96b3';
+    }else if(statuses_count>5000){
+        return'#b3bb96';
+    }else{
+        return'#96bbb3';
+    }
+};
+
+Sequencer.prototype.makeComponent = function(statuses_count){
+    if(statuses_count>1000){
+        return Rect;
+    }else{
+        return Circle;
+    }
 };
