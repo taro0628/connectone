@@ -28,15 +28,16 @@ var placeSequncer = function(x, y, tone) {
 
     var screenName;
     var iconSrc;
+    var statuses_count;
+    var favourites_count;
 
     getScreenName(text)
     .then(function(response) {
-        //トーンが指定されていなければデフォルトのスクリーンネームを設定
-        if(tone == undefined){
-            screenName = 'default';
-        }else{
-            screenName = response;
-        }
+        //ユーザオブジェクトからスクリーンネーム、ツイート数、お気に入り数を取得
+        screenName = response['screen_name'];
+        statuses_count = response['statuses_count'];
+        favourites_count = response['favourites_count'];
+
         return getIcon(screenName);
     })
     .then(function(response) {
@@ -49,7 +50,7 @@ var placeSequncer = function(x, y, tone) {
             .to({scaleX: 0, scaleY: 0}, 100)
             .call(function(x, y, tone, words, iconSrc){
 
-                var seq = new Sequencer(x, y, words, iconSrc);
+                var seq = new Sequencer(x, y, statuses_count, favourites_count, words, iconSrc);
                 sequencerList.push(seq);
                 seq.display();
 
@@ -69,6 +70,8 @@ var placeSequncer = function(x, y, tone) {
     })
     .fail(function() {
         console.log('Error');
+        createjs.Tween.get(loadingIcon)
+            .to({scaleX: 0, scaleY: 0}, 100);
     });
 }
 
@@ -86,7 +89,7 @@ var getScreenName = function(text){
     return $.ajax({
         type: 'GET',
         url: 'http://127.0.0.1:8001/user/name/' + encodeURI(text),
-        dataType: 'text'
+        dataType: 'json'
     });
 };
 
