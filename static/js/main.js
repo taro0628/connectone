@@ -13,9 +13,10 @@ var ctx;
 
 function init() {
     stage = new createjs.Stage('Canvas');
-
     $('Canvas').attr({width : windowWidth});
     $('Canvas').attr({height : windowHeight});
+
+    stage.enableMouseOver();
 
     var background = new createjs.Shape();
     background.graphics.beginFill(backColor).drawRect(0,0,windowWidth,windowHeight);

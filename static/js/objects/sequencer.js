@@ -7,6 +7,8 @@ function Sequencer(x, y, statuses_count, favourites_count, words, iconSrc){
 
     this.component = new component(x, y, this.color, false);
     this.container = this.component.container;
+    this.container.on('mouseover', this.mouseover, this);
+    this.container.on('mouseout', this.mouseout, this);
     this.container.on('pressmove', this.pressmove, this);
     this.container.on('pressup', this.pressup, this);
     this.isMoved = false;
@@ -36,6 +38,18 @@ Sequencer.prototype.noteOn = function(){
 Sequencer.prototype.remove = function(){
     this.component.remove();
     this.componentBlur.remove();
+};
+Sequencer.prototype.mouseover = function(event){
+    var seq = this;
+    this.container.cursor = 'pointer';
+    createjs.Tween.get(this.container)
+        .to({alpha:0.6}, 100);
+};
+Sequencer.prototype.mouseout = function(event){
+    var seq = this;
+    this.container.cursor = 'normal';
+    createjs.Tween.get(this.container)
+        .to({alpha:1}, 100);
 };
 Sequencer.prototype.pressmove = function(event){
     var seq = this;

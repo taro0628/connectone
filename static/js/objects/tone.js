@@ -16,8 +16,10 @@ function Tone(x, y, c, text){
     this.text = text;
     this.string = new createjs.Text(text, "20px Arial", c);
     this.circleBase = new createjs.Shape();
-    this.circleBase.on('pressmove', this.pressmove, this);
-    this.circleBase.on('pressup', this.pressup, this);
+    this.container.on('mouseover', this.mouseover, this);
+    this.container.on('mouseout', this.mouseout, this);
+    this.container.on('pressmove', this.pressmove, this);
+    this.container.on('pressup', this.pressup, this);
 
     this.string.textAlign = "center"; // 水平中央に
     this.string.textBaseline = "middle"; // 垂直中央に
@@ -81,6 +83,16 @@ Tone.prototype.move = function(_x, _y){
     this.y = _y;
 };
 
+Tone.prototype.mouseover = function(event){
+    this.container.cursor = 'pointer';
+    createjs.Tween.get(this.container)
+        .to({alpha:0.6}, 100);
+};
+Tone.prototype.mouseout = function(event){
+    this.container.cursor = 'normal';
+    createjs.Tween.get(this.container)
+        .to({alpha:1}, 100);
+};
 Tone.prototype.pressmove = function(event){
     var tone = this;
     tone.move(event.stageX, event.stageY);
