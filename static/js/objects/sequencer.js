@@ -18,6 +18,13 @@ function Sequencer(x, y, screenName, statusesCount, favouritesCount, words, icon
     icon.y = -icon.getBounds().height/2;
     this.container.addChild(icon);
 
+    this.screenName = screenName;
+    console.log(screenName)
+    this.string = new createjs.Text(screenName, "20px Arial", this.color);
+    this.string.textAlign = 'center'; // 水平中央に
+    this.string.y = 60;
+    this.container.addChild(this.string);
+
     this.componentBlur = new component(x, y, this.color, true);
 
     this.connectedTone = [];
