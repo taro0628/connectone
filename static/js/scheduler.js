@@ -8,6 +8,7 @@ var nextNoteTime = 0.0;     // 次の音がなるタイミング
 var noteResolution = 0;     // 0 == 16th, 1 == 8th, 2 == quarter note
 var noteLength = 0.1;      // 音の長さ(in seconds)
 var currentSeqNum = 0;
+var noteOnList = [];    //音を出すシーケンサーのリスト
 
 function nextNote() {
 
@@ -22,10 +23,17 @@ function nextNote() {
         if(sequencerList.length != 0){
             currentSeqNum++;
         }
-        if (currentSeqNum >= sequencerList.length) {
+        if(currentSeqNum >= sequencerList.length) {
             currentSeqNum = 0;
         }
         currentSeq = sequencerList[currentSeqNum];
+        noteOnList = [];
+        for(var i=0; i < sequencerList.length; i++){
+            //同じ色のシーケンサーをリストにまとめる
+            if(currentSeq.color == sequencerList[i].color){
+                noteOnList.push(sequencerList[i]);
+            }
+        }
     }
 }
 
@@ -35,21 +43,24 @@ function scheduleNote( beatNumber, time ) {
     if ( (noteResolution==2) && (beatNumber%4))
         return; // 1拍が4分なら4分の1は音を鳴らさない
 
-    //シーケンサーがなければ音は鳴らさない
-    if (currentSeq == undefined){
-        return;
-    }
-    //オブジェクトのアニメーション用にキューに登録
-    var seqScore = currentSeq.score;
-    if (seqScore[beatNumber] != 0){
-        currentSeq.notesInQueue.push( { note: beatNumber, time: time } );
-    }
+    for(var i=0; i < noteOnList.length; i++){
+        var seq = noteOnList[i];
 
-    //ここから音を出す処理
-    var _time;
-    for (var j = 0; j < currentSeq.connectedTone.length; j++) {
-        var tone = currentSeq.connectedTone[j];
-        seqNoteOn(currentSeq, tone, beatNumber, time);
+        //シーケンサーがなければ音は鳴らさない
+        if (seq == undefined){
+            return;
+        }
+        //オブジェクトのアニメーション用にキューに登録
+        var seqScore = seq.score;
+        if (seqScore[beatNumber] != 0){
+            seq.notesInQueue.push( { note: beatNumber, time: time } );
+        }
+
+        //ここから音を出す処理
+        for (var j = 0; j < seq.connectedTone.length; j++) {
+            var tone = seq.connectedTone[j];
+            seqNoteOn(seq, tone, beatNumber, time);
+        }
     }
 }
 
@@ -63,7 +74,7 @@ function seqNoteOn(seq, tone, beatNumber, time) {
         var _x = tone.x - seq.x;
         var _y = tone.y - seq.y;
         var dist = Math.sqrt(_x * _x + _y * _y);
-        _time = time + dist/1000;
+        var _time = time + dist/1000;
         if(toneQueue.time != _time){
             toneQueue.push( { note: beatNumber, time: _time } );
             tone.synth.noteOn(toneScore[beatNumber], _time);
