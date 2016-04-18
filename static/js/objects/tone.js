@@ -15,14 +15,14 @@ function Tone(x, y, c, text){
 
     this.text = text;
     this.string = new createjs.Text(text, "20px Arial", c);
+    this.string.textAlign = "center"; // 水平中央に
+    this.string.textBaseline = "middle"; // 垂直中央に
+
     this.circleBase = new createjs.Shape();
     this.container.on('mouseover', this.mouseover, this);
     this.container.on('mouseout', this.mouseout, this);
     this.container.on('pressmove', this.pressmove, this);
     this.container.on('pressup', this.pressup, this);
-
-    this.string.textAlign = "center"; // 水平中央に
-    this.string.textBaseline = "middle"; // 垂直中央に
 
     this.circleBase.graphics
         .beginFill('#fff')

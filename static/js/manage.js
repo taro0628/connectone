@@ -26,17 +26,17 @@ var placeSequncer = function(x, y, tone) {
         text = 'none'
     }
 
-    var screenName;
     var iconSrc;
-    var statuses_count;
-    var favourites_count;
+    var screenName;
+    var statusesCount;
+    var favouritesCount;
 
     getScreenName(text)
     .then(function(response) {
         //ユーザオブジェクトからスクリーンネーム、ツイート数、お気に入り数を取得
         screenName = response['screen_name'];
-        statuses_count = response['statuses_count'];
-        favourites_count = response['favourites_count'];
+        statusesCount = response['statusesCount'];
+        favouritesCount = response['favouritesCount'];
 
         return getIcon(screenName);
     })
@@ -50,7 +50,7 @@ var placeSequncer = function(x, y, tone) {
             .to({scaleX: 0, scaleY: 0}, 100)
             .call(function(x, y, tone, words, iconSrc){
 
-                var seq = new Sequencer(x, y, statuses_count, favourites_count, words, iconSrc);
+                var seq = new Sequencer(x, y, screenName, statusesCount, favouritesCount, words, iconSrc);
                 sequencerList.push(seq);
                 seq.display();
 
