@@ -1,7 +1,5 @@
-function Circle(x, y, c, isBlur){
+function Circle(c, isBlur){
 
-    this.x = x;
-    this.y = y;
     this.color = c;
     this.score = [9,0,0,0, 9,0,0,0, 9,0,0,0, 9,0,0,0];
     this.notesInQueue = [];
@@ -43,8 +41,6 @@ function Circle(x, y, c, isBlur){
         .setStrokeStyle(1)
         .arc(0,0,35,Math.PI*1.5,Math.PI*2);
 
-    this.container.x = x;
-    this.container.y = y;
     this.container.scaleX = this.container.scaleY = 0;
 
     //ノートオン時のエフェクトを設定
@@ -96,16 +92,7 @@ Circle.prototype.display = function(){
     createjs.Tween.get(this.circle5, {loop:true}).to({rotation:-360}, 2000);
     createjs.Tween.get(this.circle6, {loop:true}).to({rotation:360}, 1000);
 };
-Circle.prototype.noteOn = function(){
-    createjs.Tween.get(this.effect)
-        .to({scaleX:1, scaleY:1, rotation:360}, 300)
-        .to({scaleX:0, scaleY:0}, 300);
-};
-Circle.prototype.remove =  function(){
-    createjs.Tween.get(this.container,{override:true})
-    .to({scaleX:0, scaleY:0}, 300)
-    .call(function(){stage.removeChild(this)});
-};
+
 Circle.prototype.move = function(_x, _y){
     createjs.Tween.get(this.container,{override:true})
     .to({x:_x, y:_y}, 100)

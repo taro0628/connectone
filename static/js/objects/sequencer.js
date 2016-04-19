@@ -5,8 +5,10 @@ function Sequencer(x, y, screenName, statusesCount, favouritesCount, words, icon
     this.color = this.makeColor(statusesCount);
     var component = this.makeComponent(favouritesCount);
 
-    this.component = new component(x, y, this.color, false);
+    this.component = new component(this.color, false);
     this.container = this.component.container;
+    this.container.x = x;
+    this.container.y = y;
     this.container.on('mouseover', this.mouseover, this);
     this.container.on('mouseout', this.mouseout, this);
     this.container.on('pressmove', this.pressmove, this);
@@ -39,12 +41,21 @@ Sequencer.prototype.display = function(){
     this.componentBlur.display();
 }
 Sequencer.prototype.noteOn = function(){
-    this.component.noteOn();
-    this.componentBlur.noteOn();
+    createjs.Tween.get(this.component.effect)
+        .to({scaleX:1, scaleY:1, rotation:360}, 300)
+        .to({scaleX:0, scaleY:0}, 300);
+    createjs.Tween.get(this.componentBlur.effect)
+        .to({scaleX:1, scaleY:1, rotation:360}, 300)
+        .to({scaleX:0, scaleY:0}, 300);
 }
 Sequencer.prototype.remove = function(){
-    this.component.remove();
-    this.componentBlur.remove();
+    createjs.Tween.get(this.component.container,{override:true})
+    .to({scaleX:0, scaleY:0}, 300)
+    .call(function(){stage.removeChild(this.component)});
+
+    createjs.Tween.get(this.componentBlur.container,{override:true})
+    .to({scaleX:0, scaleY:0}, 300)
+    .call(function(){stage.removeChild(this.componentBlur)});
 };
 Sequencer.prototype.mouseover = function(event){
     var seq = this;
@@ -64,8 +75,11 @@ Sequencer.prototype.pressmove = function(event){
     this.x = event.stageX;
     this.y = event.stageY;
 
-    this.component.move(event.stageX, event.stageY);
-    this.componentBlur.move(event.stageX, event.stageY);
+    createjs.Tween.get(this.component.container,{override:true})
+    .to({x:this.x, y:this.y}, 100);
+
+    createjs.Tween.get(this.componentBlur.container,{override:true})
+    .to({x:this.x, y:this.y}, 100);
 
     seq.isMoved = true;
 };

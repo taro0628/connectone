@@ -1,7 +1,5 @@
-function Rect(x, y, c, isBlur){
+function Rect(c, isBlur){
 
-    this.x = x;
-    this.y = y;
     this.color = c;
     this.score = [9,0,9,0, 9,0,9,0, 9,0,9,0, 9,0,9,0];
     this.notesInQueue = [];
@@ -28,8 +26,6 @@ function Rect(x, y, c, isBlur){
         .setStrokeStyle(2)
         .drawRect(-30, -30, 60, 60);
 
-    this.container.x = x;
-    this.container.y = y;
     this.container.scaleX = this.container.scaleY = 0;
 
     //ノートオン時のエフェクトを設定
@@ -68,19 +64,4 @@ Rect.prototype.display = function(){
     createjs.Tween.get(this.rect1, {loop:true}).to({rotation:360}, 2000);
     createjs.Tween.get(this.rect2, {loop:true}).to({rotation:-360}, 2000);
     createjs.Tween.get(this.rect3, {loop:true}).to({rotation:360}, 1000);
-};
-Rect.prototype.noteOn = function(){
-    createjs.Tween.get(this.effect)
-        .to({scaleX:1, scaleY:1, rotation:360}, 300)
-        .to({scaleX:0, scaleY:0}, 300);
-};
-Rect.prototype.remove =  function(){
-    createjs.Tween.get(this.container,{override:true})
-    .to({scaleX:0, scaleY:0}, 300)
-    .call(function(){stage.removeChild(this)});
-};
-Rect.prototype.move = function(_x, _y){
-    createjs.Tween.get(this.container,{override:true})
-    .to({x:_x, y:_y}, 100)
-    .call(function(){this.x=_x;this.y=_y});
 };
