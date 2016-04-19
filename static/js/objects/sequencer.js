@@ -21,7 +21,6 @@ function Sequencer(x, y, screenName, statusesCount, favouritesCount, words, icon
     this.container.addChild(icon);
 
     this.screenName = screenName;
-    console.log(screenName)
     this.string = new createjs.Text(screenName, "20px Arial", this.color);
     this.string.textAlign = 'center'; // 水平中央に
     this.string.y = 60;
