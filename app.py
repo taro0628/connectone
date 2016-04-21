@@ -112,10 +112,6 @@ def getIcon(screen_name):
     access_token = session.get('access_token', '')
     access_token_secret = session.get('access_token_secret', '')
 
-    #screen_nameがdefaultだったらログインしたユーザーのスクリーンネームを設定
-    if screen_name == 'default':
-        screen_name = session.get('screen_name')
-
     auth = OAuth(access_token, access_token_secret, secretjson["consumer_key"], secretjson["consumer_secret"])
     t = Twitter(auth = auth)
 
@@ -126,11 +122,11 @@ def getIcon(screen_name):
     # URLから画像を開く
     response      = requests.get(image_url)
     pillow_object = Image.open(BytesIO(response.content))
-    
+
     # HTTPレスポンスを作成する
     output = BytesIO()
     pillow_object.save(output, format='png')
-    
+
     res = HTTPResponse(status=200, body=output.getvalue())
     res.set_header('Content-Type', 'image/png')
     return res
@@ -155,7 +151,6 @@ def getName(text):
     #テキストで検索
     result = t.search.tweets(q = text, lang = 'ja', count = 100)
     rand = random.randint(0, 99)
-    print(rand)
     screen_name = result['statuses'][rand]['user']['screen_name']
     user = result['statuses'][rand]['user']
 
@@ -180,10 +175,6 @@ def filter(text):
 #スクリーンネームで指定したユーザの頻出単語を取得
 @route('/tweet/words/<screen_name>')
 def getTweet(screen_name):
-    #screen_nameがdefaultだったらログインしたユーザーのスクリーンネームを設定
-    if screen_name == 'default':
-        session = request.environ.get('beaker.session')
-        screen_name = session.get('screen_name')
 
     mecab = MeCab.Tagger ('-d /usr/local/lib/mecab/dic/mecab-ipadic-neologd')
 
@@ -203,10 +194,10 @@ def getTweet(screen_name):
         mecab.parse('')
         node = mecab.parseToNode(text)
         while node:
-            print('{0}, {1}'.format(node.surface, node.feature))
+            #print('{0}, {1}'.format(node.surface, node.feature))
             word = node.surface
             pos = node.feature.split(",")[1]
-            print(pos)
+            #print(pos)
             if pos == "固有名詞" and len(word) != 1:
                 word2freq[word] += 1
             node = node.next
