@@ -8,7 +8,7 @@
 </head>
 <body onload="init();">
     <section id="top">
-        <h1>ConnecTone</h1>
+        <h1><img src="/static/img/logo.png" width="561" height="213" alt="ConnecTone"></h1>
         <div class="btn">LOGIN with TWITTER</div>
     </section>
     <canvas id="Canvas"></canvas>

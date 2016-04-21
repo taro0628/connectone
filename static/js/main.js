@@ -3,7 +3,9 @@ var windowWidth = $(window).width();
 var windowHeight = $(window).height();
 var backColor = '#0E0E0E';
 
-var loadingIcon;
+var loadingIconSheet;
+var isLoading = false;
+var isExistSeq = false;
 var currentSeq;
 
 var AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -11,20 +13,31 @@ var ctx;
 
 function init() {
     stage = new createjs.Stage('Canvas');
-
     $('Canvas').attr({width : windowWidth});
     $('Canvas').attr({height : windowHeight});
+
+    stage.enableMouseOver();
+
     var background = new createjs.Shape();
-    background.graphics.beginFill('#0E0E0E').drawRect(0,0,windowWidth,windowHeight);
+    background.graphics.beginFill(backColor).drawRect(0,0,windowWidth,windowHeight);
     stage.addChild(background);
+
+    //画面幅に合わせてキャンバスを更新
+    var id;
+    $(window).on('resize', function(e){
+        clearTimeout(id);
+        id = setTimeout(function(){
+            stage.canvas.width = $(e.target).width();
+            stage.canvas.height = $(e.target).height();
+        }, 100);
+    });
 
     //ローディングアイコンを読み込み
     var data = {};
     data.images = ['/static/img/loading.png'];
     data.frames = {width:100, height:100, regX:50, regY:50};
     data.animations = {load: [0, 16]};
-    var loadingIconSheet = new createjs.SpriteSheet(data);
-    loadingIcon = new createjs.Sprite(loadingIconSheet);
+    loadingIconSheet = new createjs.SpriteSheet(data);
 
     createjs.EventDispatcher.initialize(Sequencer.prototype);
 
@@ -35,12 +48,13 @@ function init() {
     //セッションがあればトップ画面は表示しない
     if(cookie[0] == 'beaker.session.id'){
         ctx = new AudioContext();
-        //シーケンサーを設置
+        //最初のシーケンサーを設置
         placeSequncer(windowWidth/2, windowHeight/2);
         currentSeq = sequencerList[0];
 
+        //クリックした場所にシーケンサーを置くように設定
         $(window).on('click', function(event){
-            if(currentSeq == undefined){
+            if(isExistSeq == false && currentSeq == undefined && isLoading == false){
                 placeSequncer(event.pageX, event.pageY);
                 currentSeq = sequencerList[0];
             }
@@ -53,7 +67,7 @@ function init() {
         createjs.Ticker.addEventListener('tick', tick);
     //セッションがなければtwitterでログインしてもらうためトップ画面を表示
     }else{
-        $('#top').fadeIn();
+        $('#top').fadeIn(1000);
         $('#top .btn').on('click', function(){
             //ボタンをクリックするとtwitterの認証画面に飛ぶ
             getRequestURL()

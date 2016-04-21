@@ -145,12 +145,21 @@ def getName(text):
     auth = OAuth(access_token, access_token_secret, secretjson["consumer_key"], secretjson["consumer_secret"])
     t = Twitter(auth = auth)
 
+    #テキストがnoneだったらログインユーザを返す
+    if text == 'none':
+        session = request.environ.get('beaker.session')
+        screen_name = session.get('screen_name')
+        user = t.users.show(screen_name = screen_name)
+        return user
+
+    #テキストで検索
     result = t.search.tweets(q = text, lang = 'ja', count = 100)
     rand = random.randint(0, 99)
     print(rand)
     screen_name = result['statuses'][rand]['user']['screen_name']
+    user = result['statuses'][rand]['user']
 
-    return screen_name
+    return user
 
 # ツイート文の余計な部分を削除
 def filter(text):

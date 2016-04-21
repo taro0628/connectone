@@ -7,6 +7,7 @@ var sequencerList = [];
 var placeSequncer = function(x, y, tone) {
 
     //ローディングアイコンを表示
+    var loadingIcon = new createjs.Sprite(loadingIconSheet);
     loadingIcon.x = x;
     loadingIcon.y = y;
     loadingIcon.scaleX = 0;
@@ -15,6 +16,7 @@ var placeSequncer = function(x, y, tone) {
     stage.addChild(loadingIcon);
     createjs.Tween.get(loadingIcon)
         .to({scaleX: 0.7, scaleY: 0.7}, 100);
+    isLoading = true;
 
     //トーンが指定されていなければダミーのテキストを設定
     var text;
@@ -24,17 +26,18 @@ var placeSequncer = function(x, y, tone) {
         text = 'none'
     }
 
-    var screenName;
     var iconSrc;
+    var screenName;
+    var statusesCount;
+    var favouritesCount;
 
     getScreenName(text)
     .then(function(response) {
-        //トーンが指定されていなければデフォルトのスクリーンネームを設定
-        if(tone == undefined){
-            screenName = 'default';
-        }else{
-            screenName = response;
-        }
+        //ユーザオブジェクトからスクリーンネーム、ツイート数、お気に入り数を取得
+        screenName = response['screen_name'];
+        statusesCount = response['statusesCount'];
+        favouritesCount = response['favouritesCount'];
+
         return getIcon(screenName);
     })
     .then(function(response) {
@@ -46,11 +49,29 @@ var placeSequncer = function(x, y, tone) {
         createjs.Tween.get(loadingIcon)
             .to({scaleX: 0, scaleY: 0}, 100)
             .call(function(x, y, tone, words, iconSrc){
-                createSequncer(x, y, tone, words, iconSrc);
+
+                var seq = new Sequencer(x, y, screenName, statusesCount, favouritesCount, words, iconSrc);
+                sequencerList.push(seq);
+                seq.display();
+
+                //トーンが指定されていれば線でつなぐ
+                tone = tone || undefined;
+                if(tone != undefined){
+                    //トーンを登録
+                    seq.connectedTone.push(tone)
+
+                    tone.connectedSeq.push(seq);
+                    lineList.push(new Line(seq, tone, '#fff'));
+                }
+
+                isLoading = false;
+                if(!isExistSeq){isExistSeq=true}
             },[x, y, tone, words, iconSrc]);
     })
     .fail(function() {
         console.log('Error');
+        createjs.Tween.get(loadingIcon)
+            .to({scaleX: 0, scaleY: 0}, 100);
     });
 }
 
@@ -113,27 +134,6 @@ var getIcon = function (screenName) {
     return dfd.promise();
 };
 
-var createSequncer =  function(x, y, tone, words, iconSrc){
-//シーケンサーを設置する関数
-//トーンが指定されていれば設置したシーケンサーと繋ぐ
-
-    tone = tone || undefined;
-    var rand = Math.random();
-    var component = rand>0.5 ? Rect : Circle;
-    var seq = new Sequencer(x, y, '#96bbb3', component, words, iconSrc);
-    sequencerList.push(seq);
-    seq.display();
-
-    //トーンが指定されていれば線を引く
-    if(tone != undefined){
-        //トーンを登録
-        seq.connectedTone.push(tone)
-
-        tone.connectedSeq.push(seq);
-        lineList.push(new Line(seq, tone, '#fff'));
-    }
-}
-
 var deleteSequencer = function(seq){
     for (var i = 0; i < seq.connectedTone.length; i++) {
         //つながっているトーンから自分を消す
@@ -150,6 +150,7 @@ var deleteSequencer = function(seq){
     sequencerList.splice(count, 1);
     if(sequencerList.length == 0){
         currentSeq = undefined;
+        isExistSeq = false;
     }
     seq.remove();
 }

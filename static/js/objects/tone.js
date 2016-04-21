@@ -15,12 +15,14 @@ function Tone(x, y, c, text){
 
     this.text = text;
     this.string = new createjs.Text(text, "20px Arial", c);
-    this.circleBase = new createjs.Shape();
-    this.circleBase.on('pressmove', this.pressmove, this);
-    this.circleBase.on('pressup', this.pressup, this);
-
     this.string.textAlign = "center"; // 水平中央に
     this.string.textBaseline = "middle"; // 垂直中央に
+
+    this.circleBase = new createjs.Shape();
+    this.container.on('mouseover', this.mouseover, this);
+    this.container.on('mouseout', this.mouseout, this);
+    this.container.on('pressmove', this.pressmove, this);
+    this.container.on('pressup', this.pressup, this);
 
     this.circleBase.graphics
         .beginFill('#fff')
@@ -35,38 +37,38 @@ function Tone(x, y, c, text){
     this.container.addChild(this.string);
 
     stage.addChild(this.container);
+
+    //ノートオン時のエフェクトを設定
+    this.effect = new createjs.Shape();
+    this.effect.graphics
+        .beginStroke(this.color)
+        .setStrokeStyle(1)
+        .drawCircle(0,0,100);
+    this.effect.scaleX = this.effect.scaleY = 0;
+    this.effectBlur = new createjs.Shape();
+    this.effectBlur.graphics
+        .beginStroke(this.color)
+        .setStrokeStyle(1)
+        .drawCircle(0,0,100);
+    this.effectBlur.scaleX = this.effectBlur.scaleY = 0;
+    var blurFilter = new createjs.BlurFilter(0, 0, 2);
+    blurFilter.blurX = blurFilter.blurY = 10;
+    this.effectBlur.filters = [blurFilter];
+    this.effectBlur.cache(-100, -100, 200, 200);
+    this.container.addChild(this.effect);
+    this.container.addChild(this.effectBlur);
+
 }
 Tone.prototype.display = function(){
     createjs.Tween.get(this.container).to({scaleX:1, scaleY:1}, 300);
 };
 Tone.prototype.noteOn = function(){
-    var effect = new createjs.Shape();
-    effect.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawCircle(0,0,100);
-    effect.scaleX = effect.scaleY = 0;
-    createjs.Tween.get(effect)
+    createjs.Tween.get(this.effect)
         .to({scaleX:1, scaleY:1}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-
-    var effectBlur = new createjs.Shape();
-    effectBlur.graphics
-        .beginStroke(this.color)
-        .setStrokeStyle(1)
-        .drawCircle(0,0,100);
-    effectBlur.scaleX = effectBlur.scaleY = 0;
-    createjs.Tween.get(effectBlur)
+        .to({scaleX:0, scaleY:0}, 300);
+    createjs.Tween.get(this.effectBlur)
         .to({scaleX:1, scaleY:1}, 300)
-        .to({scaleX:0, scaleY:0}, 300)
-        .call(function(){stage.removeChild(this)});
-    var blurFilter = new createjs.BlurFilter(0, 0, 2);
-        blurFilter.blurX = blurFilter.blurY = 10;
-        effectBlur.filters = [blurFilter];
-        effectBlur.cache(-100, -100, 200, 200);
-    this.container.addChild(effect);
-    this.container.addChild(effectBlur);
+        .to({scaleX:0, scaleY:0}, 300);
 };
 Tone.prototype.remove =  function(){
     createjs.Tween.get(this.container,{override:true})
@@ -81,6 +83,16 @@ Tone.prototype.move = function(_x, _y){
     this.y = _y;
 };
 
+Tone.prototype.mouseover = function(event){
+    this.container.cursor = 'pointer';
+    createjs.Tween.get(this.container)
+        .to({alpha:0.6}, 100);
+};
+Tone.prototype.mouseout = function(event){
+    this.container.cursor = 'normal';
+    createjs.Tween.get(this.container)
+        .to({alpha:1}, 100);
+};
 Tone.prototype.pressmove = function(event){
     var tone = this;
     tone.move(event.stageX, event.stageY);
@@ -90,8 +102,10 @@ Tone.prototype.pressup = function(event){
     var tone = this;
     if(!tone.isMoved){
         if(event.nativeEvent.button == 2){
+            //右クリックの時はトーンを消去する
             deleteTone(tone);
         }else{
+            //クリックの時はシーケンサーを設置する
             var _x;
             var _y;
             var r = 90;
@@ -130,12 +144,17 @@ function makeRecipe(text){
 }
 
 function makePitch(text){
-    len = Math.random() * 9;
-    if(len < 3){
+    var _text = window.btoa(encodeURI(text));
+    var num = 0;
+    for (var i = 0; i < _text.length; i++) {
+        num += _text.charCodeAt(i);
+    }
+
+    if(num < 3){
         return 9;
-    }else if(len < 6){
+    }else if(num < 6){
         return 11;
-    }else if(len < 9){
+    }else if(num < 9){
         return 13;
     }else{
         return 15;
@@ -147,8 +166,8 @@ function makeScore(text){
 
     score1 = [12,0,19,0];
     score2 = [19,0,24,0];
-    score3 = [18,0,21,0];
-    score4 = [14,0,18,0];
+    score3 = [18,21,0,0];
+    score4 = [14,0,18,18];
 
     if(len < 3){
         return score1.concat(score3).concat(score2).concat(score1);
