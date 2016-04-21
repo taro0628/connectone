@@ -35,8 +35,8 @@ var placeSequncer = function(x, y, tone) {
     .then(function(response) {
         //ユーザオブジェクトからスクリーンネーム、ツイート数、お気に入り数を取得
         screenName = response['screen_name'];
-        statusesCount = response['statusesCount'];
-        favouritesCount = response['favouritesCount'];
+        statusesCount = response['statuses_count'];
+        favouritesCount = response['favourites_count'];
 
         return getIcon(screenName);
     })
@@ -89,7 +89,7 @@ var getScreenName = function(text){
     return $.ajax({
         type: 'GET',
         url: 'http://k-taro.xyz/user/name/' + encodeURI(text),
-        dataType: 'text'
+        dataType: 'json'
     });
 };
 
