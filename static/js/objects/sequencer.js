@@ -3,43 +3,47 @@ function Sequencer(x, y, screenName, statusesCount, favouritesCount, words, icon
     this.y = y;
 
     this.color = this.makeColor(statusesCount);
+    this.connectedTone = [];
+    this.notesInQueue = [];
+    this.words = words;
     var component = this.makeComponent(favouritesCount);
 
+    //コンポーネントを表示
     this.component = new component(this.color, false);
     this.container = this.component.container;
     this.container.x = x;
     this.container.y = y;
-    this.container.on('mouseover', this.mouseover, this);
-    this.container.on('mouseout', this.mouseout, this);
-    this.container.on('pressmove', this.pressmove, this);
-    this.container.on('pressup', this.pressup, this);
-    this.isMoved = false;
+    this.score = this.component.score;
 
+    this.componentBlur = new component(this.color, true);
+    this.componentBlur.container.x = x;
+    this.componentBlur.container.y = y;
+
+    //アイコンを表示
     var icon = new createjs.Bitmap(iconSrc);
     icon.x = -icon.getBounds().width/2;
     icon.y = -icon.getBounds().height/2;
     this.container.addChild(icon);
 
+    //スクリーンネームを表示
     this.screenName = screenName;
     this.string = new createjs.Text(screenName, "20px Arial", this.color);
     this.string.textAlign = 'center'; // 水平中央に
     this.string.y = 60;
     this.container.addChild(this.string);
 
-    this.componentBlur = new component(x, y, this.color, true);
-
-    this.connectedTone = [];
-
-    this.score = this.component.score;
-    this.notesInQueue = [];
-
-    this.words = words;
+    this.container.on('mouseover', this.mouseover, this);
+    this.container.on('mouseout', this.mouseout, this);
+    this.container.on('pressmove', this.pressmove, this);
+    this.container.on('pressup', this.pressup, this);
+    this.isMoved = false;
 }
 Sequencer.prototype.display = function(){
     this.component.display();
     this.componentBlur.display();
 }
 Sequencer.prototype.noteOn = function(){
+    //音が出るときのエフェクトを表示
     createjs.Tween.get(this.component.effect)
         .to({scaleX:1, scaleY:1, rotation:360}, 300)
         .to({scaleX:0, scaleY:0}, 300);
@@ -48,6 +52,7 @@ Sequencer.prototype.noteOn = function(){
         .to({scaleX:0, scaleY:0}, 300);
 }
 Sequencer.prototype.remove = function(){
+    //消去時のアニメーション
     createjs.Tween.get(this.component.container,{override:true})
     .to({scaleX:0, scaleY:0}, 300)
     .call(function(){stage.removeChild(this.component)});
