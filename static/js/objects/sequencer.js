@@ -92,15 +92,15 @@ Sequencer.prototype.pressup = function(event){
     //移動モードを解除
     if(!seq.isMoved){
         //右クリックの時はシーケンサーを消去する
-        if(event.nativeEvent.button == 2){
-            deleteSequencer(seq);
-        }else{
+        //if(event.nativeEvent.button == 2){
+        //    deleteSequencer(seq);
+        //}else{
             //クリックの時はトーンを設置する
             text = seq.words[0];
             //一度使った単語はもう使わない
             seq.words.splice(0, 1);
             placeTone(seq, text, seq.x, seq.y, 90);
-        }
+        //}
     }
     seq.isMoved = false;
 };
@@ -118,9 +118,12 @@ Sequencer.prototype.makeColor = function(statusesCount){
 };
 
 Sequencer.prototype.makeComponent = function(statusesCount){
-    if(statusesCount>1000){
+    if(statusesCount<500){
         return Rect;
-    }else{
+    }else if (statusesCount<1000) {
         return Circle;
+    }else{
+
+        return Triangle;
     }
 };

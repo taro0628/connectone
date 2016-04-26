@@ -37,9 +37,6 @@ var placeSequncer = function(x, y, tone) {
         screenName = response['screen_name'];
         statusesCount = response['statuses_count'];
         favouritesCount = response['favourites_count'];
-        console.log(screenName)
-        console.log(statusesCount)
-        console.log(favouritesCount)
 
         return getIcon(screenName);
     })

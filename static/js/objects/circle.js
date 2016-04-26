@@ -1,6 +1,7 @@
 function Circle(c, isBlur){
 
     this.color = c;
+    this.type = 'circle';
     this.score = [9,0,0,0, 9,0,0,0, 9,0,0,0, 9,0,0,0];
     this.notesInQueue = [];
     this.container = new createjs.Container();

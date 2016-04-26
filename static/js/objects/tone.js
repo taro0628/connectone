@@ -9,7 +9,7 @@ function Tone(x, y, c, text){
     this.score = makeScore(text);
     this.container = new createjs.Container();
     this.isMoved = false;
-    this.synth = new Synth(ctx, this.recipe);
+    this.synth = new Manipulator(ctx, this.recipe);
 
     this.connectedSeq = [];
 
@@ -25,7 +25,7 @@ function Tone(x, y, c, text){
     this.container.on('pressup', this.pressup, this);
 
     this.circleBase.graphics
-        .beginFill('#fff')
+        .beginFill(c)
         .drawCircle(0,0,30);
 
     this.circleBase.alpha = 0.1;
@@ -101,10 +101,10 @@ Tone.prototype.pressmove = function(event){
 Tone.prototype.pressup = function(event){
     var tone = this;
     if(!tone.isMoved){
-        if(event.nativeEvent.button == 2){
-            //右クリックの時はトーンを消去する
-            deleteTone(tone);
-        }else{
+        //if(event.nativeEvent.button == 2){
+        //    //右クリックの時はトーンを消去する
+        //    deleteTone(tone);
+        //}else{
             //クリックの時はシーケンサーを設置する
             var _x;
             var _y;
@@ -113,7 +113,7 @@ Tone.prototype.pressup = function(event){
             _x = r * Math.cos(random) + event.stageX;
             _y = r * Math.sin(random) + event.stageY;
             placeSequncer(_x, _y, tone);
-        }
+        //}
     }
     tone.isMoved = false;
 };
@@ -127,19 +127,19 @@ function makeRecipe(text){
 
     var len = text.length;
     if(num < 1000){
-        return bassdrum;
-    }else if(num < 2000){
-        return snare;
-    }else if(num < 3000){
-        return highhat;
-    }else if(num < 4000){
         return tone1;
-    }else if(num < 5000){
+    }else if(num < 2000){
         return tone2;
-    }else if(num < 6000){
+    }else if(num < 3000){
         return tone3;
+    }else if(num < 4000){
+        return tone4;
+    }else if(num < 5000){
+        return tone5;
+    }else if(num < 6000){
+        return tone6;
     }else{
-        return highhat;
+        return tone7;
     }
 }
 

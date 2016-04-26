@@ -1,6 +1,7 @@
 function Rect(c, isBlur){
 
     this.color = c;
+    this.type = 'rect';
     this.score = [9,0,9,0, 9,0,9,0, 9,0,9,0, 9,0,9,0];
     this.notesInQueue = [];
     this.container = new createjs.Container();
