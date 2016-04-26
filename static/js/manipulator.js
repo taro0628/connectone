@@ -1,15 +1,22 @@
+/**
+Manipulator
+
+Copyright (c) 2016 Kotaro Makino
+
+This software is released under the MIT License.
+http://opensource.org/licenses/mit-license.php
+*/
 function ModuleManager(){
 
 }
 //AudioNodeを管理するオブジェクト
 ModuleManager.prototype.Module = function(setModule){
-    this.nodeList = new Array(10);
-    this.paramList = new Array(10);
-    this.nodeCount = 0;
+    this.nodeList = [];
+    this.paramList = [];
     this.type = null;
 
     //AudioNodeの設定を行う関数
-    //引数は(Synthオブジェクト, 今見ているレシピノード, AudioNodeの接続先)
+    //引数は(Manipulatorオブジェクト, 今見ているレシピノード, AudioNodeの接続先)
     this.setModule = setModule;
 };
 ModuleManager.prototype.registerModule = function(name, setModule, type){
@@ -20,13 +27,12 @@ ModuleManager.prototype.registerModule = function(name, setModule, type){
 ModuleManager.prototype.registerAudioNode = function(currentRecipeNode, audioNode){
     var module = this[currentRecipeNode['name']];
     //モジュールにAudioNodeを登録
-    currentRecipeNode['id'] = module.nodeCount;
-    module.nodeList[currentRecipeNode['id']] = audioNode;
-    module.nodeCount += 1;
+    currentRecipeNode['id'] = module.nodeList.length;
+    module.nodeList.push(audioNode);
 
     //レシピにparamが設定されていればparamListに追加
     if (currentRecipeNode['param'] != undefined){
-        module.paramList[currentRecipeNode['id']] = currentRecipeNode['param'];
+        module.paramList.push(currentRecipeNode['param']);
     }
 
 };
@@ -42,12 +48,19 @@ ModuleManager.prototype.getAudioNode = function(recipeNode){
     return module.nodeList[recipeNode['id']];
 };
 
-function Synth(ctx, recipe){
+function Manipulator(ctx, recipe, mm){
     this.ctx = ctx;
     this.freq = 0;
-    this.moduleManager = new ModuleManager(); //モジュールを管理するオブジェクト
+    if(mm == undefined){
+        this.moduleManager = new ModuleManager(); //モジュールを管理するオブジェクト
+    }else{
+        this.moduleManager = mm;
+    }
+
+
     this.recipe = recipe;
     this.cvList = []; //周波数を設定する必要のあるAudioNodeを管理する
+    this.maxRelease = 0; //エンベロープの最大リリース値
 
     //moduleManagerにモジュールを登録
     this.moduleManager.registerModule('Mixer', this.setMixer);
@@ -58,37 +71,38 @@ function Synth(ctx, recipe){
     this.moduleManager.registerModule('Noise', this.setNoise);
     this.moduleManager.registerModule('Delay', this.setDelay);
 
-    this.initSynth();
-    this.setSynth(JSON.parse(JSON.stringify(this.recipe)), this.ctx.destination);
+    //recipeをもとにAudioNodeをつなぐ
+    this.setManipulator(JSON.parse(JSON.stringify(this.recipe)), this.ctx.destination);
+
+    this.initManipulator();
+}
+Manipulator.prototype.initManipulator = function(){
+    //オシレータを再生状態にする
+    //音のON、OFFはエンベロープで管理
     for (key in this.moduleManager){
+        //モジュールにVCOオプションが付いていればそのモジュールはオシレータを持っている
         if (this.moduleManager[key].type == 'VCO'){
-            for (var i=0; i<this.moduleManager[key].nodeCount; i++){
-                this.moduleManager[key].nodeList[i].start(0);
+            var nodeList = this.moduleManager[key].nodeList;
+            for (var i=0; i<nodeList.length; i++){
+                nodeList[i].start(0);
             }
         }
     }
-}
-Synth.prototype.initSynth = function(){
-    //moduleManagerを初期化
-    for (key in this.moduleManager){
-        this.moduleManager[key].nodeCount = 0;
-    }
-    this.maxRelease = 0;
 };
 
-Synth.prototype.noteNoTofreq = function (noteNo){
+Manipulator.prototype.noteNoTofreq = function (noteNo){
     //note番号を周波数に変換
     //9番がA(440Hz)
     return 440.0 * Math.pow(2.0, (noteNo - 9.0) / 12.0);
 };
 
-Synth.prototype.setSynth = function(currentRecipeNode, destNode) {
+Manipulator.prototype.setManipulator = function(currentRecipeNode, destNode) {
     //レシピをもとにAudioNode作成し、destNodeにつないでいく
     var module = this.moduleManager[currentRecipeNode['name']];
     module.setModule(this, currentRecipeNode, destNode);
 }
 
-Synth.prototype.EnvOn = function(vca, param, time) {
+Manipulator.prototype.EnvOn = function(vca, param, time) {
     //音の鳴り始めのエンベーロープ処理
     var attack = param['attack'];
     var decay = param['decay'];
@@ -97,11 +111,11 @@ Synth.prototype.EnvOn = function(vca, param, time) {
     this.noteOnTime = time;
 
     //attackとdecayが0だとノイズが出るので調整
-    attack = attack || 0.001;
-    decay = decay || 0.001;
+    if(attack < 0.01){attack = 0.01;}
+    if(decay < 0.01){decay = 0.01;}
 
     vca.gain.cancelScheduledValues(time);  // スケジュールを全て解除
-    vca.gain.setValueAtTime(0.0, time);  // 今時点を音の出始めとする
+    vca.gain.linearRampToValueAtTime(0.0, time);// 今時点を音の出始めとする
     vca.gain.linearRampToValueAtTime(gain, time + attack);
     // ▲ gainまでattackかけて直線的に変化
     vca.gain.linearRampToValueAtTime(sustain * gain, time + attack + decay);
@@ -109,7 +123,7 @@ Synth.prototype.EnvOn = function(vca, param, time) {
 
     return ;
 };
-Synth.prototype.EnvOff = function(vca, param, time) {
+Manipulator.prototype.EnvOff = function(vca, param, time) {
     //音の鳴り終わりのエンベロープ処理
     var attack = param['attack'];
     var decay = param['decay'];
@@ -129,7 +143,7 @@ Synth.prototype.EnvOff = function(vca, param, time) {
     return;
 };
 
-Synth.prototype.noteOn = function(noteNo, time) {
+Manipulator.prototype.noteOn = function(noteNo, time) {
     //音の鳴り始めの処理
     var now = this.ctx.currentTime;
     var moduleManager = this.moduleManager;
@@ -146,14 +160,15 @@ Synth.prototype.noteOn = function(noteNo, time) {
     //Envが指定してあるモジュールについてエンベロープ処理を実行
     for (key in moduleManager){
         if (moduleManager[key].type == 'Env'){
-            for (var i=0; i<moduleManager[key].nodeCount; i++){
-                this.EnvOn(moduleManager[key].nodeList[i], moduleManager[key].paramList[i], time);
+            var nodeList = moduleManager[key].nodeList;
+            for (var i=0; i<nodeList.length; i++){
+                this.EnvOn(nodeList[i], moduleManager[key].paramList[i], time);
             }
         }
     }
 };
 
-Synth.prototype.noteOff = function(time){
+Manipulator.prototype.noteOff = function(time){
     //音の鳴り終わりの処理
     var now = this.ctx.currentTime;
     var moduleManager = this.moduleManager;
@@ -165,12 +180,12 @@ Synth.prototype.noteOff = function(time){
     for (key in moduleManager){
         if (moduleManager[key].type == 'Env'){
             //vcaのreleaseに合わせて音量を0にする
-            for (var i=0; i<this.moduleManager['Env'].nodeCount; i++){
-                this.EnvOff(moduleManager[key].nodeList[i], moduleManager[key].paramList[i], time);
+            var nodeList = moduleManager[key].nodeList;
+            for (var i=0; i<nodeList.length; i++){
+                this.EnvOff(nodeList[i], moduleManager[key].paramList[i], time);
             }
         }
     }
-
 };
 
 ////////////////////////
@@ -178,25 +193,25 @@ Synth.prototype.noteOff = function(time){
 ////////////////////////
 
 //ミキサーを設定
-Synth.prototype.setMixer = function(synth, currentRecipeNode, destNode) {
+Manipulator.prototype.setMixer = function(Manipulator, currentRecipeNode, destNode) {
 
     var input = currentRecipeNode['input'];
     //Mixerに接続されるノードの設定が終わっていなければ設定する
     for (var i = 0; i < input.length; i++) {
-        synth.setSynth(input[i], destNode);
+        Manipulator.setManipulator(input[i], destNode);
     }
     //ここまでくればinputの設定が終わっているのでdestNodeに接続
     for (var i = 0; i < input.length; i++) {
-        var inputAudioNode = synth.moduleManager.getAudioNode(input[i]);
+        var inputAudioNode = Manipulator.moduleManager.getAudioNode(input[i]);
         inputAudioNode.connect(destNode);
     }
     currentRecipeNode['status'] = true;
     return ;
 };
 
-Synth.prototype.setVCO = function(synth, currentRecipeNode, destNode) {
-    var vco = synth.ctx.createOscillator();
-    synth.moduleManager.registerAudioNode(currentRecipeNode, vco);
+Manipulator.prototype.setVCO = function(Manipulator, currentRecipeNode, destNode) {
+    var vco = Manipulator.ctx.createOscillator();
+    Manipulator.moduleManager.registerAudioNode(currentRecipeNode, vco);
     var param = currentRecipeNode['param'];
     var octave = 1;
 
@@ -206,12 +221,12 @@ Synth.prototype.setVCO = function(synth, currentRecipeNode, destNode) {
         if(param['octave'] != undefined){
             octave =param['octave'];
         }
-        vco.frequency.value = synth.freq * octave;
-        synth.cvList.push(vco);
+        vco.frequency.value = Manipulator.freq * octave;
+        Manipulator.cvList.push(vco);
     //frequencyにレシピノードが設定されていればそのレシピノードをfrequencyにつなぐ
     }else if(param['frequency']['name'] != undefined){
         var paramNode = param['frequency'];
-        synth.setSynth(paramNode, vco.frequency);
+        Manipulator.setManipulator(paramNode, vco.frequency);
 
     //それ以外は数値とみなして代入
     }else{
@@ -222,7 +237,7 @@ Synth.prototype.setVCO = function(synth, currentRecipeNode, destNode) {
     if(param['detune'] != undefined){
         if(param['detune']['name'] != undefined){
             var paramNode = param['detune'];
-            synth.setSynth(paramNode, vco.detune);
+            Manipulator.setManipulator(paramNode, vco.detune);
 
         //それ以外は数値とみなして代入
         }else{
@@ -237,19 +252,19 @@ Synth.prototype.setVCO = function(synth, currentRecipeNode, destNode) {
     currentRecipeNode['state'] = true;
 };
 
-Synth.prototype.setEnv = function(synth, currentRecipeNode, destNode) {
-    var env = synth.ctx.createGain();
-    synth.moduleManager.registerAudioNode(currentRecipeNode, env);
+Manipulator.prototype.setEnv = function(Manipulator, currentRecipeNode, destNode) {
+    var env = Manipulator.ctx.createGain();
+    Manipulator.moduleManager.registerAudioNode(currentRecipeNode, env);
 
     //音を止める時に十分な時間を確保するためにreleaseの最大値を記録
-    if (currentRecipeNode['param']['release'] > synth.maxRelease){
-        synth.maxRelease = currentRecipeNode['param']['release'];
+    if (currentRecipeNode['param']['release'] > Manipulator.maxRelease){
+        Manipulator.maxRelease = currentRecipeNode['param']['release'];
     }
     var input = currentRecipeNode['input'];
 
     //Envに接続されるノードの設定が終わっていなければ設定する
     if (input['state'] == undefined){
-        synth.setSynth(input, env);
+        Manipulator.setManipulator(input, env);
     }
     //EnvノードをdestNodeに接続
     env.gain.value = 0.0;
@@ -257,38 +272,38 @@ Synth.prototype.setEnv = function(synth, currentRecipeNode, destNode) {
     currentRecipeNode['state'] = true;
 };
 
-Synth.prototype.setVCA = function(synth, currentRecipeNode, destNode) {
+Manipulator.prototype.setVCA = function(Manipulator, currentRecipeNode, destNode) {
 
-    var vca = synth.ctx.createGain();
-    synth.moduleManager.registerAudioNode(currentRecipeNode, vca);
+    var vca = Manipulator.ctx.createGain();
+    Manipulator.moduleManager.registerAudioNode(currentRecipeNode, vca);
 
     vca.gain.value = currentRecipeNode['gain'];
     var input = currentRecipeNode['input'];
 
     //VCAに接続されるノードの設定が終わっていなければ設定する
     if (input['state'] == undefined){
-        synth.setSynth(input, vca);
+        Manipulator.setManipulator(input, vca);
     }
     //VCAノードをdestNodeに接続
     vca.connect(destNode);
     currentRecipeNode['state'] = true;
 };
 
-Synth.prototype.setVCF = function(synth, currentRecipeNode, destNode) {
+Manipulator.prototype.setVCF = function(Manipulator, currentRecipeNode, destNode) {
 
-    var freq = synth.freq;
+    var freq = Manipulator.freq;
 
     var param = currentRecipeNode['param'];
-    var vcf = synth.ctx.createBiquadFilter();
-    synth.moduleManager.registerAudioNode(currentRecipeNode, vcf);
+    var vcf = Manipulator.ctx.createBiquadFilter();
+    Manipulator.moduleManager.registerAudioNode(currentRecipeNode, vcf);
 
     if (param['frequency'] == 'cv'){
         vcf.frequency.value = freq;
-        synth.cvList.push(vcf);
+        Manipulator.cvList.push(vcf);
     //frequencyにオブジェクトが設定されていればそのオブジェクトをfrequencyにつなぐ
     }else if(param['frequency']['name'] != undefined){
         var paramNode = param['frequency'];
-        synth.setSynth(paramNode, vcf.frequency);
+        Manipulator.setManipulator(paramNode, vcf.frequency);
 
     //それ以外は数値とみなして代入
     }else{
@@ -298,7 +313,7 @@ Synth.prototype.setVCF = function(synth, currentRecipeNode, destNode) {
     if(param['detune'] != undefined){
         if(param['detune']['name'] != undefined){
             var paramNode = param['detune'];
-            synth.setSynth(paramNode, vcf.detune);
+            Manipulator.setManipulator(paramNode, vcf.detune);
         //それ以外は数値とみなして代入
         }else{
             vcf.frequency.value = param['detune'];
@@ -313,18 +328,18 @@ Synth.prototype.setVCF = function(synth, currentRecipeNode, destNode) {
 
     //VCFに接続されるノードの設定が終わっていなければ設定する
     if (input['state'] == undefined){
-        synth.setSynth(input, vcf);
+        Manipulator.setManipulator(input, vcf);
     }
     //VCFノードをdestNodeに接続
     vcf.connect(destNode);
     currentRecipeNode['state'] = true;
 };
 
-Synth.prototype.setNoise = function(synth, currentRecipeNode, destNode) {
+Manipulator.prototype.setNoise = function(Manipulator, currentRecipeNode, destNode) {
 
     var bufsize = 1024;
-    var noise = synth.ctx.createScriptProcessor(bufsize);
-    synth.moduleManager.registerAudioNode(currentRecipeNode, noise);
+    var noise = Manipulator.ctx.createScriptProcessor(bufsize);
+    Manipulator.moduleManager.registerAudioNode(currentRecipeNode, noise);
     noise.onaudioprocess = function(ev){
         var buf0 = ev.outputBuffer.getChannelData(0);
         var buf1 = ev.outputBuffer.getChannelData(1);
@@ -337,26 +352,26 @@ Synth.prototype.setNoise = function(synth, currentRecipeNode, destNode) {
     currentRecipeNode['state'] = true;
 };
 
-Synth.prototype.setDelay = function(synth, currentRecipeNode, destNode) {
+Manipulator.prototype.setDelay = function(Manipulator, currentRecipeNode, destNode) {
 
-    var delay = synth.ctx.createDelay();
-    synth.moduleManager.registerAudioNode(currentRecipeNode, delay);
+    var delay = Manipulator.ctx.createDelay();
+    Manipulator.moduleManager.registerAudioNode(currentRecipeNode, delay);
     var input = currentRecipeNode['input'];
     var param = currentRecipeNode['param'];
 
-    var feedback = synth.ctx.createGain();
-    var wetlevel = synth.ctx.createGain();
-    var drylevel = synth.ctx.createGain();
+    var feedback = Manipulator.ctx.createGain();
+    var wetlevel = Manipulator.ctx.createGain();
+    var drylevel = Manipulator.ctx.createGain();
 
     //Delayに接続されるノードの設定が終わっていなければ設定する
     if (input['state'] == undefined){
-        synth.setSynth(input, delay);
+        Manipulator.setManipulator(input, delay);
     }
 
     if(param['delayTime'] != undefined){
         if(param['delayTime']['name'] != undefined){
             var paramNode = param['delayTime'];
-            synth.setSynth(paramNode, delay.delayTime);
+            Manipulator.setManipulator(paramNode, delay.delayTime);
         //それ以外は数値とみなして代入
         }else{
             delay.delayTime.value = param['delayTime'];
@@ -376,7 +391,7 @@ Synth.prototype.setDelay = function(synth, currentRecipeNode, destNode) {
     delay.connect(wetlevel);
     delay.connect(feedback);
     feedback.connect(delay);
-    var inputAudioNode = synth.moduleManager.getAudioNode(input);
+    var inputAudioNode = Manipulator.moduleManager.getAudioNode(input);
     inputAudioNode.connect(drylevel);
     wetlevel.connect(destNode);
     drylevel.connect(destNode);

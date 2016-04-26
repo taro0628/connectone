@@ -62,7 +62,7 @@ function init() {
         //スケジューラを動かす
         var timerId = setInterval(function(){
             scheduler();
-        }, lookahead)
+        }, lookahead);
 
         createjs.Ticker.addEventListener('tick', tick);
     //セッションがなければtwitterでログインしてもらうためトップ画面を表示
@@ -91,9 +91,9 @@ var getRequestURL = function(){
 };
 
 //右クリックを禁止
-document.oncontextmenu = function(){
-    return false;
-};
+//document.oncontextmenu = function(){
+//    return false;
+//};
 
 function tick() {
     var currentTime = ctx.currentTime;
@@ -107,8 +107,29 @@ function tick() {
         if (seqQueue.length && seqQueue[0].time < currentTime) {
             seq.noteOn();
             seqQueue.splice(0,1);
+
+            //シーケンサーからトーンに向かうエフェクト
+            for (var j=0; j<seq.connectedTone.length; j++){
+                var tone = seq.connectedTone[j];
+                if(tone.notesInQueue[0] != undefined){
+                    var circle = new createjs.Shape();
+                    circle.graphics
+                        .beginFill('rgba(255, 255, 255, 0.5)')
+                        .drawCircle(0,0,10);
+                    circle.x = seq.x;
+                    circle.y = seq.y;
+
+                    stage.addChild(circle);
+
+                    createjs.Tween.get(circle)
+                        .to({x:tone.x, y:tone.y}, (tone.notesInQueue[0].time - currentTime)*1000)
+                        .to({scaleX:0, scaleY:0}, 300)
+                        .call(function(){stage.removeChild(this)});
+                }
+            }
         }
         for (var j=0; j<seq.connectedTone.length; j++){
+
             var toneScore = seq.connectedTone[j].score;
             var toneQueue = seq.connectedTone[j].notesInQueue;
             //トーンのキューの時間が過ぎていればエフェクトを再生
