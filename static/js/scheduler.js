@@ -50,11 +50,6 @@ function scheduleNote( beatNumber, time ) {
         if (seq == undefined){
             return;
         }
-        //オブジェクトのアニメーション用にキューに登録
-        var seqScore = seq.score;
-        if (seqScore[beatNumber] != 0){
-            seq.notesInQueue.push( { note: beatNumber, time: time } );
-        }
 
         //ここから音を出す処理
         for (var j = 0; j < seq.connectedTone.length; j++) {
@@ -71,6 +66,12 @@ function seqNoteOn(seq, tone, beatNumber, time) {
 
     //シーケンサーのスコアとトーンのスコアの両方に音が設定されていれば鳴らす
     if (seqScore[beatNumber] != 0 && toneScore[beatNumber] != 0){
+        //シーケンサーのアニメーションを登録
+        var seqScore = seq.score;
+        if (seqScore[beatNumber] != 0){
+            seq.notesInQueue.push( { note: beatNumber, time: time } );
+        }
+
         //距離によってタイミングを変更
         var _x = tone.x - seq.x;
         var _y = tone.y - seq.y;
